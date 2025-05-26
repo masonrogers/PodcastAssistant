@@ -1,1 +1,10 @@
-create a windows 11 program with a modern looking gui using Python. I want it to showcase all of the varius elements of the gui like labels, scrollable paragraphs, buttons, progress bars, etc.
+This project provides a minimal GUI for selecting a sound file.
+It presents a single "Browse" button which opens a file dialog and
+allows the user to choose an audio file such as WAV or MP3. The
+selected path is displayed in a read-only field.
+
+## Running
+
+```bash
+python3 main.py
+```
