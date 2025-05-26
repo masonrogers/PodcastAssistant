@@ -1,1 +1,7 @@
-create a windows 11 program with a modern looking gui using Python. I want it to showcase all of the varius elements of the gui like labels, scrollable paragraphs, buttons, progress bars, etc.
+This project demonstrates a simple Windows 11 style GUI written in Python using Tkinter. It showcases basic interface elements such as labels, scrollable paragraphs, buttons, and a progress bar.
+
+## Running
+
+```bash
+python3 main.py
+```
