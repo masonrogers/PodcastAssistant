@@ -1,0 +1,1 @@
+create a windows 11 program with a modern looking gui using Python. I want it to showcase all of the varius elements of the gui like labels, scrollable paragraphs, buttons, progress bars, etc.
