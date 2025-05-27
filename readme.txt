@@ -38,6 +38,10 @@ ClipExporter	Cuts audio for highlighted range via FFmpeg
 Settings	Persists UI prefs & keyword path
 Installer	NSIS script for final .exe
 
+Locating Transcription and Diarization
+-------------------------------------
+Timestamped transcription segments are generated in ``src/transcribe_worker.py`` using the Whisper library. Speaker labeling is performed in ``src/diarizer.py`` with ``pyannote.audio``. See the unit tests in ``tests/`` for basic usage.
+
 4 — If an AI Agent Will Write the Code
 
     Supply acceptance tests (pytest) that cover every feature above.

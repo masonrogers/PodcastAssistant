@@ -9,7 +9,8 @@ class TranscribeWorker:
 
     def transcribe(self, audio_path: str):
         """Transcribe the given audio file and return segments."""
-        result = self.model.transcribe(audio_path)
+        # request timestamps from the Whisper model
+        result = self.model.transcribe(audio_path, word_timestamps=False)
         segments = []
         for seg in result.get("segments", []):
             segments.append({
