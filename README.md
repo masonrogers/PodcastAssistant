@@ -38,6 +38,7 @@
 ### Locating Transcription and Diarization
 
 Timestamped transcription segments are generated in `src/transcribe_worker.py` using the Whisper library. Speaker labeling is performed in `src/diarizer.py` with `pyannote.audio`. See the unit tests in `tests/` for basic usage.
+The `TranscriptAggregator` in `src/transcript_aggregator.py` can merge these segment lists into a single timeline.
 
 ## 4 — If an AI Agent Will Write the Code
 
