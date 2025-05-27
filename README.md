@@ -34,6 +34,8 @@
 | `ClipExporter`        | Cuts audio for highlighted range via FFmpeg            |
 | `Settings`            | Persists UI prefs & keyword path                       |
 | `Installer`           | NSIS script for final .exe                             |
+The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides
+`export_clip(audio_path, start, end, dest_path)` for saving short audio clips.
 
 ### Locating Transcription and Diarization
 
