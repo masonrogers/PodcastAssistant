@@ -20,7 +20,7 @@ class FakeAnnotation:
         ]
 
 
-def test_diarizer_assigns_speakers(monkeypatch):
+def test_diarizer_lazy_load_and_reuse(monkeypatch):
     fake_pipeline_instance = MagicMock(return_value=FakeAnnotation())
 
     fake_pipeline_class = MagicMock()
@@ -32,7 +32,11 @@ def test_diarizer_assigns_speakers(monkeypatch):
     monkeypatch.setitem(sys.modules, 'pyannote.audio', fake_pyannote)
 
     diarizer = importlib.import_module('diarizer')
+    diarizer = importlib.reload(diarizer)
     worker = diarizer.Diarizer()
+
+    # Pipeline should not be loaded during initialization
+    fake_pipeline_class.from_pretrained.assert_not_called()
 
     segments = [
         {'start': 0.2, 'end': 0.8, 'speaker': 'Speaker 1', 'text': 'Hi'},
@@ -44,3 +48,8 @@ def test_diarizer_assigns_speakers(monkeypatch):
     assert labeled[1]['speaker'] == 'SpeakerB'
     fake_pipeline_class.from_pretrained.assert_called_once()
     fake_pipeline_instance.assert_called_once_with('dummy.wav')
+
+    # Subsequent calls should reuse the same pipeline instance
+    worker.assign_speakers('dummy2.wav', segments)
+    fake_pipeline_class.from_pretrained.assert_called_once()
+    assert fake_pipeline_instance.call_count == 2
