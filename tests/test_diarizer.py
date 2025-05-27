@@ -53,3 +53,39 @@ def test_diarizer_lazy_load_and_reuse(monkeypatch):
     worker.assign_speakers('dummy2.wav', segments)
     fake_pipeline_class.from_pretrained.assert_called_once()
     assert fake_pipeline_instance.call_count == 2
+
+
+class FakeAnnotation2:
+    def itertracks(self, yield_label=True):
+        return [
+            (FakeSegment(0.0, 0.5), None, 'Alpha'),
+            (FakeSegment(1.0, 1.5), None, 'Beta'),
+        ]
+
+
+def test_assign_speakers_labels_segments(monkeypatch):
+    fake_pipeline_instance = MagicMock(return_value=FakeAnnotation2())
+
+    fake_pipeline_class = MagicMock()
+    fake_pipeline_class.from_pretrained.return_value = fake_pipeline_instance
+
+    fake_pyannote = types.ModuleType('pyannote.audio')
+    fake_pyannote.Pipeline = fake_pipeline_class
+
+    monkeypatch.setitem(sys.modules, 'pyannote.audio', fake_pyannote)
+
+    diarizer = importlib.import_module('diarizer')
+    diarizer = importlib.reload(diarizer)
+    worker = diarizer.Diarizer()
+
+    segments = [
+        {'start': 0.1, 'end': 0.2, 'speaker': '', 'text': 'a'},
+        {'start': 1.2, 'end': 1.3, 'speaker': '', 'text': 'b'},
+        {'start': 0.6, 'end': 0.7, 'speaker': '', 'text': 'c'},
+    ]
+    labeled = worker.assign_speakers('audio.wav', segments)
+
+    assert labeled[0]['speaker'] == 'Alpha'
+    assert labeled[1]['speaker'] == 'Beta'
+    assert labeled[2]['speaker'] == 'Unknown'
+    fake_pipeline_instance.assert_called_once_with('audio.wav')
