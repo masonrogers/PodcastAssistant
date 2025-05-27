@@ -4,7 +4,7 @@ Whisper Transcriber — Simplified Plan (no timelines)
 
     Accept multiple audio files (browse or drag-drop) and let the user re-order them.
 
-    Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
+    Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later). If Whisper is not installed, a fallback stub is used.
 
     Display live transcript plus a per-file progress bar during processing.
 
@@ -14,7 +14,9 @@ Whisper Transcriber — Simplified Plan (no timelines)
 
         Full transcript → TXT, JSON, SRT
 
-        Highlighted segment → same text formats plus clipped audio (FFmpeg).
+        Highlighted segment → same text formats plus clipped audio (FFmpeg). If FFmpeg is missing the original file is copied.
+
+    Note: When optional packages such as Whisper, PySide6, or pyannote.audio are not installed, the application falls back to basic stub implementations so the tests still run.
 
     Entirely offline / internal use; no data leaves the machine.
 
