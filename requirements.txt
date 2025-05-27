@@ -1,4 +1,4 @@
-openai-whisper
+whispercpp
 pyannote.audio
 ffmpeg-python
 PySide6
