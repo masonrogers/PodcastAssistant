@@ -1,16 +1,16 @@
-import whisper
+from whispercpp import Whisper
 
 class TranscribeWorker:
     """Loads a Whisper model and transcribes audio files."""
 
-    def __init__(self, model_name: str = "base"):
-        self.model_name = model_name
-        self.model = whisper.load_model(model_name)
+    def __init__(self, model_path: str = "large"):
+        self.model_path = model_path
+        self.model = Whisper(model_path)
 
     def transcribe(self, audio_path: str):
         """Transcribe the given audio file and return segments."""
         # request timestamps from the Whisper model
-        result = self.model.transcribe(audio_path, word_timestamps=False)
+        result = self.model.transcribe(audio_path)
         segments = []
         for seg in result.get("segments", []):
             segments.append({

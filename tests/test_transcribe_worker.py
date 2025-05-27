@@ -15,9 +15,9 @@ def test_transcribe_worker_returns_structured_segments(monkeypatch):
             {"start": 1.0, "end": 2.0, "text": "World"},
         ]
     }
-    fake_whisper = types.ModuleType('whisper')
-    fake_whisper.load_model = MagicMock(return_value=fake_model)
-    monkeypatch.setitem(sys.modules, 'whisper', fake_whisper)
+    fake_whispercpp = types.ModuleType('whispercpp')
+    fake_whispercpp.Whisper = MagicMock(return_value=fake_model)
+    monkeypatch.setitem(sys.modules, 'whispercpp', fake_whispercpp)
 
     transcribe_worker = importlib.import_module('transcribe_worker')
     transcribe_worker = importlib.reload(transcribe_worker)
@@ -29,20 +29,20 @@ def test_transcribe_worker_returns_structured_segments(monkeypatch):
         {"start": 1.0, "end": 2.0, "speaker": "Speaker 1", "text": "World"},
     ]
     assert segments == expected
-    fake_whisper.load_model.assert_called_once_with('base')
-    fake_model.transcribe.assert_called_once_with('dummy.wav', word_timestamps=False)
+    fake_whispercpp.Whisper.assert_called_once_with('large')
+    fake_model.transcribe.assert_called_once_with('dummy.wav')
 
 def test_transcribe_worker_custom_model(monkeypatch):
     fake_model = MagicMock()
     fake_model.transcribe.return_value = {"segments": []}
-    fake_whisper = types.ModuleType('whisper')
-    fake_whisper.load_model = MagicMock(return_value=fake_model)
-    monkeypatch.setitem(sys.modules, 'whisper', fake_whisper)
+    fake_whispercpp = types.ModuleType('whispercpp')
+    fake_whispercpp.Whisper = MagicMock(return_value=fake_model)
+    monkeypatch.setitem(sys.modules, 'whispercpp', fake_whispercpp)
 
     transcribe_worker = importlib.import_module('transcribe_worker')
     transcribe_worker = importlib.reload(transcribe_worker)
-    worker = transcribe_worker.TranscribeWorker(model_name='tiny')
+    worker = transcribe_worker.TranscribeWorker(model_path='tiny.bin')
     worker.transcribe('dummy.wav')
 
-    fake_whisper.load_model.assert_called_once_with('tiny')
-    fake_model.transcribe.assert_called_once()
+    fake_whispercpp.Whisper.assert_called_once_with('tiny.bin')
+    fake_model.transcribe.assert_called_once_with('dummy.wav')
