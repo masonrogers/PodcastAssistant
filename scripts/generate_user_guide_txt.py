@@ -2,7 +2,7 @@ CONTENT_LINES = [
     "Whisper Transcriber User Guide",
     "",
     "Installation:",
-    "1. Install Python and FFmpeg.",
+    "1. Install Python. FFmpeg will be installed automatically by the bootstrapper.",
     "2. Run 'python build_installer.py' to create the executable.",
     "3. Launch the installer from 'dist/'.",
     "",

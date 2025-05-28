@@ -2,7 +2,7 @@
 
 ## 1 — Core Functionality
 
-- On startup, the bootstrapper first ensures PySide6 is installed so the Qt
+- On startup, the bootstrapper first ensures PySide6 and FFmpeg are installed so the Qt
   progress window can launch. The window then installs any remaining
   dependencies with a progress bar before starting the main application.
 - Accept multiple audio files (browse or drag-drop). The file list supports

@@ -2,6 +2,7 @@ import os
 import sys
 import types
 import importlib
+import shutil
 
 # add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -64,6 +65,7 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
     monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
     import subprocess
     monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
 
     req_path = tmp_path / 'reqs.txt'
     req_path.write_text('pkgA\npkgB\npkgC\n')
@@ -99,6 +101,7 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
 
     import subprocess
     monkeypatch.setattr(subprocess, 'run', fake_run)
+    monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
 
     # PySide6 missing -> installation should occur
     monkeypatch.setattr(importlib.util, 'find_spec', lambda name: None)
@@ -111,5 +114,35 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
     runs.clear()
     monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
     bs_module.ensure_pyside6()
+
+    assert runs == []
+
+
+def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch):
+    """ensure_ffmpeg installs ffmpeg-static only if FFmpeg is missing."""
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    runs = []
+
+    def fake_run(args, check=False):
+        runs.append(args)
+
+    import subprocess
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+
+    # FFmpeg missing -> installation should occur
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
+    monkeypatch.setattr(shutil, 'which', lambda name: None)
+    bs_module = importlib.import_module('bootstrapper')
+    bs_module = importlib.reload(bs_module)
+
+    assert runs == [[sys.executable, '-m', 'pip', 'install', 'ffmpeg-static']]
+
+    # FFmpeg present -> no installation attempt
+    runs.clear()
+    monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
+    bs_module.ensure_ffmpeg()
 
     assert runs == []
