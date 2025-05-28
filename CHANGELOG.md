@@ -11,3 +11,7 @@ All notable changes to this project will be documented in this file.
   startup with a progress dialog before launching the main window.
 - Uninstaller removes packages installed by the bootstrapper during uninstall.
 
+### Changed
+- Bootstrapper now installs PySide6 first so the progress window can launch
+  before installing remaining dependencies.
+

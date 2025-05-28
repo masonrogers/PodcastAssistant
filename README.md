@@ -2,9 +2,9 @@
 
 ## 1 — Core Functionality
 
-- On startup, check for required dependencies. If any are missing, open a
-  bootstrap window that installs them with a progress bar, then closes to launch
-  the main application.
+- On startup, the bootstrapper first ensures PySide6 is installed so the Qt
+  progress window can launch. The window then installs any remaining
+  dependencies with a progress bar before starting the main application.
 - Accept multiple audio files (browse or drag-drop) and let the user re-order them.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
 - Display live transcript plus a per-file progress bar during processing.
@@ -38,7 +38,7 @@
 | `ClipExporter`        | Cuts audio for highlighted range via FFmpeg            |
 | `TranscriptExporter`  | Exports transcript segments to TXT, JSON, and SRT |
 | `Settings`            | Persists UI prefs & keyword path                       |
-| `Bootstrapper`        | Checks dependencies and installs missing packages with a progress dialog |
+| `Bootstrapper`        | Installs PySide6 if needed and then shows a progress dialog while installing the rest |
 | `Installer`           | NSIS script for final .exe                             |
 | `uninstaller.py`      | Removes packages during uninstall |
 The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides

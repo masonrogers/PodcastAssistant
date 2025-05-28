@@ -6,6 +6,18 @@ import os
 import sys
 import subprocess
 import importlib.util
+
+
+def ensure_pyside6() -> None:
+    """Install PySide6 if it's not already available."""
+    if importlib.util.find_spec("PySide6") is None:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "PySide6"], check=False
+        )
+
+
+ensure_pyside6()
+
 from PySide6 import QtCore
 
 
