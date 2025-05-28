@@ -19,3 +19,9 @@ class TranscriptAggregator:
     def get_transcript(self) -> List[Dict]:
         """Return all collected segments ordered by start time."""
         return sorted(self._segments, key=lambda s: s.get("start", 0.0))
+
+    def rename_speaker(self, old_name: str, new_name: str) -> None:
+        """Rename a speaker in all stored segments."""
+        for seg in self._segments:
+            if seg.get("speaker") == old_name:
+                seg["speaker"] = new_name
