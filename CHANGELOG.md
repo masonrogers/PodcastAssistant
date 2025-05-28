@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file.
   management and uninstallation.
 - Settings dialog allows changing the keyword list path and UI preferences with
     saved values reloaded on restart.
+- Tests now verify that `ensure_pyside6()` installs PySide6 only when it's
+  missing.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

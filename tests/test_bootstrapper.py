@@ -84,3 +84,32 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
     ]
     assert runs == expected_runs
     assert progress == [0.5, 1.0, 'done']
+
+
+def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch):
+    """ensure_pyside6 installs PySide6 only if it's missing."""
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    runs = []
+
+    def fake_run(args, check=False):
+        runs.append(args)
+
+    import subprocess
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+
+    # PySide6 missing -> installation should occur
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: None)
+    bs_module = importlib.import_module('bootstrapper')
+    bs_module = importlib.reload(bs_module)
+
+    assert runs == [[sys.executable, '-m', 'pip', 'install', 'PySide6']]
+
+    # PySide6 present -> no installation attempt
+    runs.clear()
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
+    bs_module.ensure_pyside6()
+
+    assert runs == []
