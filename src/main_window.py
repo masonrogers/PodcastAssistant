@@ -50,6 +50,37 @@ class DiarizerThread(QtCore.QThread):
         self.finished.emit(labeled)
 
 
+class SettingsDialog(QtWidgets.QDialog):
+    """Dialog for editing :class:`Settings`."""
+
+    def __init__(self, settings: Settings, parent=None) -> None:
+        super().__init__(parent)
+        self.settings = settings
+
+        self.setWindowTitle("Settings")
+        layout = QtWidgets.QVBoxLayout(self)
+
+        layout.addWidget(QtWidgets.QLabel("Keyword List Path"))
+        self.keyword_edit = QtWidgets.QLineEdit(settings.keyword_path)
+        layout.addWidget(self.keyword_edit)
+
+        layout.addWidget(QtWidgets.QLabel("Theme"))
+        self.theme_edit = QtWidgets.QLineEdit(settings.ui.get("theme", ""))
+        layout.addWidget(self.theme_edit)
+
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        )
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def accept(self) -> None:  # pragma: no cover - trivial
+        self.settings.keyword_path = self.keyword_edit.text()
+        self.settings.ui["theme"] = self.theme_edit.text()
+        super().accept()
+
+
 class MainWindow(QtWidgets.QMainWindow):
     """Main application window with drag-drop file list and transcript viewer."""
 
@@ -91,6 +122,9 @@ class MainWindow(QtWidgets.QMainWindow):
         export_row.addWidget(self.rename_button)
         layout.addLayout(export_row)
 
+        self.settings_button = QtWidgets.QPushButton("Settings")
+        layout.addWidget(self.settings_button)
+
         self.process_button = QtWidgets.QPushButton("Process Files")
         layout.addWidget(self.process_button)
 
@@ -114,6 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.export_srt_button.clicked.connect(self._on_export_srt)
         self.export_segment_button.clicked.connect(self._on_export_segment)
         self.rename_button.clicked.connect(self._on_rename_speakers)
+        self.settings_button.clicked.connect(self._on_settings)
         self.process_button.clicked.connect(self.start_processing)
 
     # Drag and drop events
@@ -277,3 +312,9 @@ class MainWindow(QtWidgets.QMainWindow):
             fh.write(text)
         audio_path = path.rsplit(".", 1)[0] + ".wav"
         self.clip_exporter.export_clip(seg.get("file", ""), seg.get("start", 0.0), seg.get("end", 0.0), audio_path)
+
+    def _on_settings(self) -> None:
+        dialog = SettingsDialog(self.settings, self)
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            self.settings.save()
+            self.keyword_index = KeywordIndex(self.settings.keyword_path)

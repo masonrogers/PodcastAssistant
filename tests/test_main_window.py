@@ -83,6 +83,24 @@ def make_pyside6_stub():
         def __init__(self, *a, **kw):
             super().__init__(*a, **kw)
 
+    class QDialog(StubObject):
+        Accepted = 1
+        Rejected = 0
+        def exec(self):
+            return QDialog.Accepted
+        def accept(self):
+            return QDialog.Accepted
+        def reject(self):
+            return QDialog.Rejected
+
+    class QDialogButtonBox(StubObject):
+        Ok = 1
+        Cancel = 2
+        accepted = Signal()
+        rejected = Signal()
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+
     class QFileDialog(StubObject):
         @staticmethod
         def getSaveFileName(*a, **kw):
@@ -142,6 +160,8 @@ def make_pyside6_stub():
     qtwidgets.QPlainTextEdit = QPlainTextEdit
     qtwidgets.QLineEdit = QLineEdit
     qtwidgets.QPushButton = QPushButton
+    qtwidgets.QDialog = QDialog
+    qtwidgets.QDialogButtonBox = QDialogButtonBox
     qtwidgets.QFileDialog = QFileDialog
     qtwidgets.QListWidget = QListWidget
     qtwidgets.QListWidgetItem = QListWidgetItem
@@ -513,3 +533,38 @@ def test_rename_speakers_updates_export(monkeypatch):
 
     assert exported['data'][0]['speaker'] == 'Host'
     assert exported['data'][1]['speaker'] == 'Guest'
+
+
+def test_settings_dialog_persists(monkeypatch, tmp_path):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    path = tmp_path / 'settings.json'
+    st_mod = importlib.import_module('settings'); st_mod = importlib.reload(st_mod)
+    settings = st_mod.Settings(str(path))
+
+    class FakeDialog:
+        def __init__(self, s, parent=None):
+            self.s = s
+        def exec(self):
+            self.s.keyword_path = str(tmp_path / 'kw.json')
+            self.s.ui['theme'] = 'dark'
+            return stubs['PySide6.QtWidgets'].QDialog.Accepted
+
+    kw = types.ModuleType('keyword_index'); kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    m = importlib.import_module('main_window'); m = importlib.reload(m)
+    monkeypatch.setattr(m, 'SettingsDialog', FakeDialog)
+
+    window = m.MainWindow(settings=settings)
+    window._on_settings()
+
+    loaded = st_mod.Settings(str(path))
+    assert loaded.keyword_path == str(tmp_path / 'kw.json')
+    assert loaded.ui['theme'] == 'dark'
