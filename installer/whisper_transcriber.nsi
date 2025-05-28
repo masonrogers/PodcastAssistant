@@ -8,7 +8,14 @@ OutFile "WhisperTranscriberSetup.exe"
 InstallDir "$PROGRAMFILES\WhisperTranscriber"
 
 Section "MainSection" SEC01
-    ; TODO: add files
+    SetOutPath "$INSTDIR"
+    File "..\dist\WhisperTranscriber.exe"
+SectionEnd
+
+Section "Uninstall"
+    Delete "$INSTDIR\WhisperTranscriber.exe"
+    Delete "$INSTDIR\Uninstall.exe"
+    RMDir "$INSTDIR"
 SectionEnd
 
 Section -Post
