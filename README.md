@@ -32,6 +32,7 @@
 | `TranscriptAggregator`| Merges worker output into ordered transcript           |
 | `KeywordIndex`        | Loads/saves keyword list, search, “find all editorial” |
 | `ClipExporter`        | Cuts audio for highlighted range via FFmpeg            |
+| `TranscriptExporter`  | Exports transcript segments to TXT, JSON, and SRT |
 | `Settings`            | Persists UI prefs & keyword path                       |
 | `Installer`           | NSIS script for final .exe                             |
 The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides
