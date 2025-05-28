@@ -46,6 +46,22 @@ def make_pyside6_stub():
         def toPlainText(self):
             return self._text
 
+    class QLineEdit(StubObject):
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+            self._text = ""
+
+        def text(self):
+            return self._text
+
+        def setText(self, t):
+            self._text = t
+
+    class QPushButton(StubObject):
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+            self.clicked = Signal()
+
     qtwidgets = types.ModuleType('PySide6.QtWidgets')
     for cls in [
         'QWidget',
@@ -56,9 +72,13 @@ def make_pyside6_stub():
         'QListWidgetItem',
         'QHBoxLayout',
         'QLabel',
+        'QLineEdit',
+        'QPushButton',
     ]:
         qtwidgets.__dict__[cls] = type(cls, (StubObject,), {})
     qtwidgets.QPlainTextEdit = QPlainTextEdit
+    qtwidgets.QLineEdit = QLineEdit
+    qtwidgets.QPushButton = QPushButton
 
     qtcore = types.ModuleType('PySide6.QtCore')
     qtcore.QThread = QThread
@@ -80,8 +100,14 @@ def test_main_window_instantiates(monkeypatch):
     tw.TranscribeWorker = lambda *a, **k: None
     dr = types.ModuleType('diarizer')
     dr.Diarizer = lambda *a, **k: None
+    kw = types.ModuleType('keyword_index')
+    kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st = types.ModuleType('settings')
+    st.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
     monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
     monkeypatch.setitem(sys.modules, 'diarizer', dr)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st)
 
     mw_module = importlib.import_module('main_window')
     mw_module = importlib.reload(mw_module)
@@ -115,8 +141,14 @@ def test_add_file_triggers_threads(monkeypatch):
     tw.TranscribeWorker = FakeTranscribeWorker
     dr = types.ModuleType("diarizer")
     dr.Diarizer = FakeDiarizer
+    kw = types.ModuleType('keyword_index')
+    kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st = types.ModuleType('settings')
+    st.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
     monkeypatch.setitem(sys.modules, "transcribe_worker", tw)
     monkeypatch.setitem(sys.modules, "diarizer", dr)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st)
 
     mw_module = importlib.import_module("main_window")
     mw_module = importlib.reload(mw_module)
@@ -125,3 +157,82 @@ def test_add_file_triggers_threads(monkeypatch):
     window.add_file("a.wav")
 
     assert "[Spk1] hi" in window.transcript.toPlainText()
+
+
+def test_search_displays_results(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    class FakeKeywordIndex:
+        def __init__(self, path):
+            self.calls = []
+
+        def search(self, segs, query):
+            self.calls.append(query)
+            return segs[:1]
+
+        def find_all_editorial(self, segs):
+            return []
+
+    kw = types.ModuleType('keyword_index')
+    kw.KeywordIndex = FakeKeywordIndex
+    st_mod = types.ModuleType('settings')
+    st_mod.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st_mod)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    mw_module = importlib.import_module('main_window')
+    mw_module = importlib.reload(mw_module)
+
+    window = mw_module.MainWindow()
+    segs = [{"speaker": "S1", "text": "hello world"}, {"speaker": "S1", "text": "bye"}]
+    window.aggregator.add_segments('a.wav', segs)
+    window.search_bar.setText('world')
+    window._on_search()
+
+    assert 'hello world' in window.results.toPlainText()
+    assert window.keyword_index.calls == ['world']
+
+
+def test_find_editorials_displays_results(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    class FakeKeywordIndex:
+        def __init__(self, path):
+            self.called = False
+
+        def search(self, segs, query):
+            return []
+
+        def find_all_editorial(self, segs):
+            self.called = True
+            return segs[:1]
+
+    kw = types.ModuleType('keyword_index')
+    kw.KeywordIndex = FakeKeywordIndex
+    st_mod = types.ModuleType('settings')
+    st_mod.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st_mod)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    mw_module = importlib.import_module('main_window')
+    mw_module = importlib.reload(mw_module)
+
+    window = mw_module.MainWindow()
+    segs = [{"speaker": "S1", "text": "ad spot"}, {"speaker": "S1", "text": "talk"}]
+    window.aggregator.add_segments('a.wav', segs)
+    window._on_find_editorials()
+
+    assert 'ad spot' in window.results.toPlainText()
+    assert window.keyword_index.called is True

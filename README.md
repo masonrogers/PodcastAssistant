@@ -49,6 +49,13 @@ The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides
 Timestamped transcription segments are generated in `src/transcribe_worker.py` using the Whisper library. Speaker labeling is performed in `src/diarizer.py` with `pyannote.audio`. The diarization model loads only when speaker tags are first needed. See the unit tests in `tests/` for basic usage.
 The `TranscriptAggregator` in `src/transcript_aggregator.py` can merge these segment lists into a single timeline.
 
+## Using the Keyword Search
+
+Below the file list is a search bar with **Search** and **Find Editorials** buttons.
+Enter text in the bar and click **Search** to show transcript segments containing
+that phrase. **Find Editorials** lists segments matching any keywords loaded from
+`keywords.json`. Results appear in a pane beneath the transcript.
+
 ## 4 — If an AI Agent Will Write the Code
 
 - Supply acceptance tests (pytest) that cover every feature above.
