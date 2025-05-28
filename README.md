@@ -56,3 +56,24 @@ The `TranscriptAggregator` in `src/transcript_aggregator.py` can merge these seg
 - One-page user guide (PDF)
 
 That’s the entire plan—feature set, tech choices, modules, and deliverables—without any timelines.
+
+## Building the Installer
+
+### Prerequisites
+
+- Python with all packages from `requirements.txt`
+- `pyinstaller` available on your PATH (`pip install pyinstaller`)
+- (Optional) [NSIS](https://nsis.sourceforge.io/) for creating the final
+  Windows installer.
+
+### Invocation
+
+Run the helper script which invokes PyInstaller:
+
+```bash
+python build_installer.py
+```
+
+The resulting executable will be placed in the `dist/` directory. The
+`installer/whisper_transcriber.nsi` script can then be adapted to wrap this
+binary in an NSIS installer.
