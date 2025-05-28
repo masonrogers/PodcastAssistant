@@ -7,6 +7,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ### Added
 
 ### Changed
+- Replaced the PDF user guide with a plain text version at `docs/user_guide.txt`.
+- Added `scripts/generate_user_guide_txt.py` to regenerate the file.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
