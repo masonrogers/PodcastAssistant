@@ -91,7 +91,7 @@ application is launched.
 
 - Signed Windows installer (.exe)
 - Source repository with tests, prompts, and README
-- One-page user guide (PDF)
+- [User Guide](docs/user_guide.pdf)
 
 That’s the entire plan—feature set, tech choices, modules, and deliverables—without any timelines.
 

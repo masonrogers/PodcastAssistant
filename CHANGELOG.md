@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
     arranged sequence.
 - Rename Speakers dialog allows updating speaker labels and exports reflect the
     new names.
+- Concise PDF user guide covers installation, usage, exporting, keyword
+  management and uninstallation.
 - Settings dialog allows changing the keyword list path and UI preferences with
     saved values reloaded on restart.
 
