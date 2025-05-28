@@ -19,14 +19,22 @@ def make_pyside6_stub():
 
     class Signal:
         def __init__(self, *a):
-            self._slots = []
+            self._slots = {}
 
-        def connect(self, slot):
-            self._slots.append(slot)
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self
+            slots = self._slots.setdefault(instance, [])
 
-        def emit(self, *args):
-            for s in list(self._slots):
-                s(*args)
+            class Bound:
+                def connect(self_inner, slot):
+                    slots.append(slot)
+
+                def emit(self_inner, *args):
+                    for s in list(slots):
+                        s(*args)
+
+            return Bound()
 
     class QThread(StubObject):
         def start(self):
@@ -71,39 +79,80 @@ def make_pyside6_stub():
             self._text = t
 
     class QPushButton(StubObject):
+        clicked = Signal()
         def __init__(self, *a, **kw):
             super().__init__(*a, **kw)
-            self.clicked = Signal()
 
     class QFileDialog(StubObject):
         @staticmethod
         def getSaveFileName(*a, **kw):
             return ("", "")
 
+    class QListWidgetItem(StubObject):
+        def __init__(self, text=""):
+            self._text = text
+            self._data = {}
+
+        def text(self):
+            return self._text
+
+        def setData(self, role, value):
+            self._data[role] = value
+
+        def data(self, role):
+            return self._data.get(role)
+
+    class QListWidget(StubObject):
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+            self.items = []
+            self.dragDropMode = None
+
+        def addItem(self, item):
+            self.items.append(item)
+
+        def setItemWidget(self, item, widget):
+            item.widget = widget
+
+        def count(self):
+            return len(self.items)
+
+        def item(self, index):
+            return self.items[index]
+
+        def takeItem(self, index):
+            return self.items.pop(index)
+
+        def insertItem(self, index, item):
+            self.items.insert(index, item)
+
+        def setDragDropMode(self, mode):
+            self.dragDropMode = mode
+
     qtwidgets = types.ModuleType('PySide6.QtWidgets')
     for cls in [
         'QWidget',
         'QMainWindow',
         'QVBoxLayout',
-        'QListWidget',
         'QProgressBar',
-        'QListWidgetItem',
         'QHBoxLayout',
         'QLabel',
-        'QLineEdit',
-        'QPushButton',
     ]:
         qtwidgets.__dict__[cls] = type(cls, (StubObject,), {})
     qtwidgets.QPlainTextEdit = QPlainTextEdit
     qtwidgets.QLineEdit = QLineEdit
     qtwidgets.QPushButton = QPushButton
     qtwidgets.QFileDialog = QFileDialog
+    qtwidgets.QListWidget = QListWidget
+    qtwidgets.QListWidgetItem = QListWidgetItem
 
     qtcore = types.ModuleType('PySide6.QtCore')
     qtcore.QThread = QThread
     qtcore.QObject = StubObject
     qtcore.Signal = Signal
+    qtcore.Qt = types.SimpleNamespace(UserRole=0)
 
+    qtwidgets.QAbstractItemView = types.SimpleNamespace(InternalMove=1)
     pyside6 = types.ModuleType('PySide6')
     pyside6.QtWidgets = qtwidgets
     pyside6.QtCore = qtcore
@@ -174,8 +223,60 @@ def test_add_file_triggers_threads(monkeypatch):
 
     window = mw_module.MainWindow()
     window.add_file("a.wav")
+    window.start_processing()
 
     assert "[Spk1] hi" in window.transcript.toPlainText()
+
+
+def test_processing_respects_order(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    class FakeTranscribeWorker:
+        def __init__(self, *a, **k):
+            pass
+
+        def transcribe(self, path):
+            return [{"start": 0.0, "end": 1.0, "speaker": "", "text": path}]
+
+    class FakeDiarizer:
+        def __init__(self, *a, **k):
+            pass
+
+        def assign_speakers(self, audio_path, segments):
+            return segments
+
+    order = []
+    class FakeAggregator:
+        def add_segments(self, path, segs):
+            order.append(path)
+        def get_transcript(self):
+            return []
+
+    tw = types.ModuleType("transcribe_worker"); tw.TranscribeWorker = FakeTranscribeWorker
+    dr = types.ModuleType("diarizer"); dr.Diarizer = FakeDiarizer
+    ta = types.ModuleType('transcript_aggregator'); ta.TranscriptAggregator = lambda: FakeAggregator()
+    kw = types.ModuleType('keyword_index'); kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st = types.ModuleType('settings'); st.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    ce = types.ModuleType('clip_exporter'); ce.ClipExporter = lambda: types.SimpleNamespace()
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+    monkeypatch.setitem(sys.modules, 'transcript_aggregator', ta)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st)
+    monkeypatch.setitem(sys.modules, 'clip_exporter', ce)
+
+    m = importlib.import_module('main_window'); m = importlib.reload(m)
+    window = m.MainWindow()
+    window.add_file('a.wav')
+    window.add_file('b.wav')
+    # reorder: move second item to top
+    item = window.file_list.takeItem(1)
+    window.file_list.insertItem(0, item)
+    window.start_processing()
+
+    assert order == ['b.wav', 'a.wav']
 
 
 def test_search_displays_results(monkeypatch):

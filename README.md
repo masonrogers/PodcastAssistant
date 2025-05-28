@@ -5,7 +5,8 @@
 - On startup, the bootstrapper first ensures PySide6 is installed so the Qt
   progress window can launch. The window then installs any remaining
   dependencies with a progress bar before starting the main application.
-- Accept multiple audio files (browse or drag-drop) and let the user re-order them.
+- Accept multiple audio files (browse or drag-drop). The file list supports
+  drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
 - Display live transcript plus a per-file progress bar during processing.
 - After all files finish, enable keyword search and a “Find all editorials” button using a persistent keyword list.

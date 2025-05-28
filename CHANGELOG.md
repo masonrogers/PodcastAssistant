@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
   bar plus a **Find Editorials** button to display matching transcript segments.
 - Export buttons allow saving the full transcript as TXT, JSON or SRT. A
   highlighted segment can be saved along with a clipped audio file.
+- File list now allows drag-and-drop reordering, and processing respects the
+  arranged sequence.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

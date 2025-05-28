@@ -64,6 +64,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.file_list = QtWidgets.QListWidget()
         self.file_list.setAcceptDrops(True)
+        self.file_list.setDragDropMode(
+            QtWidgets.QAbstractItemView.InternalMove
+        )
         layout.addWidget(self.file_list)
 
         search_row = QtWidgets.QHBoxLayout()
@@ -86,6 +89,9 @@ class MainWindow(QtWidgets.QMainWindow):
         export_row.addWidget(self.export_segment_button)
         layout.addLayout(export_row)
 
+        self.process_button = QtWidgets.QPushButton("Process Files")
+        layout.addWidget(self.process_button)
+
         self.transcript = QtWidgets.QPlainTextEdit()
         layout.addWidget(self.transcript)
 
@@ -96,6 +102,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.threads: list[QtCore.QThread] = []
         self.aggregator = TranscriptAggregator()
         self.clip_exporter = ClipExporter()
+        self.current_index = 0
+        self.processing = False
 
         self.search_button.clicked.connect(self._on_search)
         self.editorial_button.clicked.connect(self._on_find_editorials)
@@ -103,6 +111,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.export_json_button.clicked.connect(self._on_export_json)
         self.export_srt_button.clicked.connect(self._on_export_srt)
         self.export_segment_button.clicked.connect(self._on_export_segment)
+        self.process_button.clicked.connect(self.start_processing)
 
     # Drag and drop events
     def dragEnterEvent(self, event):  # pragma: no cover - relies on GUI runtime
@@ -124,9 +133,24 @@ class MainWindow(QtWidgets.QMainWindow):
         progress.setRange(0, 100)
         h.addWidget(label)
         h.addWidget(progress)
+        item.setData(QtCore.Qt.UserRole, (path, progress))
         self.file_list.addItem(item)
         self.file_list.setItemWidget(item, widget)
-        # Start transcription and diarization threads
+
+    def start_processing(self) -> None:
+        """Begin processing files in the current list order."""
+        if self.processing:
+            return
+        self.processing = True
+        self.current_index = 0
+        self._process_next()
+
+    def _process_next(self) -> None:
+        if self.current_index >= self.file_list.count():
+            self.processing = False
+            return
+        item = self.file_list.item(self.current_index)
+        path, progress = item.data(QtCore.Qt.UserRole)
         t_thread = TranscriberThread(path, parent=self)
         self.threads.append(t_thread)
         t_thread.progress.connect(lambda p: progress.setValue(int(p * 50)))
@@ -150,6 +174,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.aggregator.add_segments(path, segments)
         self.display_segments(segments)
         progress.setValue(100)
+        self.current_index += 1
+        self._process_next()
 
     # Placeholder hooks for workers
     def start_transcription(self, path: str) -> None:
