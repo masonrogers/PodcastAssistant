@@ -15,9 +15,11 @@ All notable changes to this project will be documented in this file.
 - Export buttons allow saving the full transcript as TXT, JSON or SRT. A
   highlighted segment can be saved along with a clipped audio file.
 - File list now allows drag-and-drop reordering, and processing respects the
-  arranged sequence.
+    arranged sequence.
 - Rename Speakers dialog allows updating speaker labels and exports reflect the
-  new names.
+    new names.
+- Settings dialog allows changing the keyword list path and UI preferences with
+    saved values reloaded on restart.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

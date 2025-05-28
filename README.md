@@ -73,6 +73,14 @@ Click **Rename Speakers** to change the automatically detected speaker labels.
 Each name is shown in a prompt where you can enter a new label. The transcript
 pane and any exports will reflect the updated names.
 
+## Configuration
+
+Use the **Settings** button to adjust application options. The dialog lets you
+choose a new path for `keywords.json` and edit UI preferences such as the
+`theme` setting. Changes are saved to
+`%APPDATA%\WhisperTranscriber\settings.json` and take effect the next time the
+application is launched.
+
 ## 4 — If an AI Agent Will Write the Code
 
 - Supply acceptance tests (pytest) that cover every feature above.
