@@ -26,3 +26,10 @@ def test_exporter_outputs_formats():
         'World'
     )
     assert mod.export_srt(segments) == expected_srt
+
+
+def test_format_timestamp_rounding():
+    mod = importlib.import_module('transcript_exporter')
+    mod = importlib.reload(mod)
+
+    assert mod._format_timestamp(0.9995) == '00:00:01,000'

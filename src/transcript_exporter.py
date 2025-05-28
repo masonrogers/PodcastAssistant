@@ -18,10 +18,11 @@ def export_json(segments: List[Dict]) -> str:
 
 
 def _format_timestamp(seconds: float) -> str:
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    millis = int(round((seconds - int(seconds)) * 1000))
+    """Return a timestamp in ``HH:MM:SS,mmm`` format."""
+    millis_total = int(round(seconds * 1000))
+    seconds_total, millis = divmod(millis_total, 1000)
+    minutes_total, secs = divmod(seconds_total, 60)
+    hours, minutes = divmod(minutes_total, 60)
     return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
 
