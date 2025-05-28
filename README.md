@@ -77,3 +77,8 @@ python build_installer.py
 The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
 binary in an NSIS installer.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
