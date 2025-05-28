@@ -1,8 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+Whenever a feature is added or removed, update the "Unreleased" section with a detailed entry and move it to the appropriate release heading when the version is published.
 
 ## [Unreleased]
+### Added
+
+### Changed
+
+## [0.1.0] – YYYY-MM-DD
 ### Added
 - Initial changelog with sections for future releases.
 - NSIS script now copies `dist/WhisperTranscriber.exe` into the install directory and cleans it up during uninstall.
