@@ -1,0 +1,1 @@
+When writing code for Whisper Transcriber, follow Python best practices, keep modules loosely coupled and add docstrings to public functions.

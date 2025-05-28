@@ -1,0 +1,3 @@
+- Review `self_review_checklist.md` before opening a pull request.
+- Add tests for new features and update documentation.
+- Describe changes in `CHANGELOG.md`.

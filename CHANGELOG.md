@@ -31,3 +31,12 @@ All notable changes to this project will be documented in this file.
 - Uninstaller now invokes the bundled Python interpreter via
   `WhisperTranscriber.exe uninstaller.py` instead of calling `$INSTDIR\python.exe`.
 
+
+## [0.1.0] - 2025-05-28
+### Added
+- Created `prompts/` directory at the repository root.
+- Added `prompts/system_prompt.txt` defining the system prompt.
+- Added `prompts/developer_prompt.txt` with developer instructions.
+- Added `prompts/contributor_tasks.txt` describing tasks for contributors.
+- Introduced `self_review_checklist.md` to outline verification steps.
+- README now links to the prompts directory and the checklist.
