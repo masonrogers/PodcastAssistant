@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - Runtime bootstrapper installs dependencies listed in `requirements.txt` at
   startup with a progress dialog before launching the main window.
 - Uninstaller removes packages installed by the bootstrapper during uninstall.
+- Main window loads keywords from the path in `Settings` and provides a search
+  bar plus a **Find Editorials** button to display matching transcript segments.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

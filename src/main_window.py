@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from PySide6 import QtWidgets, QtCore
 
+from settings import Settings
+from keyword_index import KeywordIndex
+
 from transcribe_worker import TranscribeWorker
 from diarizer import Diarizer
 from transcript_aggregator import TranscriptAggregator
@@ -47,8 +50,10 @@ class DiarizerThread(QtCore.QThread):
 class MainWindow(QtWidgets.QMainWindow):
     """Main application window with drag-drop file list and transcript viewer."""
 
-    def __init__(self) -> None:
+    def __init__(self, settings: Settings | None = None) -> None:
         super().__init__()
+        self.settings = settings or Settings()
+        self.keyword_index = KeywordIndex(self.settings.keyword_path)
         self.setWindowTitle("Whisper Transcriber")
         central = QtWidgets.QWidget()
         self.setCentralWidget(central)
@@ -58,12 +63,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.file_list.setAcceptDrops(True)
         layout.addWidget(self.file_list)
 
+        search_row = QtWidgets.QHBoxLayout()
+        self.search_bar = QtWidgets.QLineEdit()
+        self.search_button = QtWidgets.QPushButton("Search")
+        self.editorial_button = QtWidgets.QPushButton("Find Editorials")
+        search_row.addWidget(self.search_bar)
+        search_row.addWidget(self.search_button)
+        search_row.addWidget(self.editorial_button)
+        layout.addLayout(search_row)
+
         self.transcript = QtWidgets.QPlainTextEdit()
         layout.addWidget(self.transcript)
+
+        self.results = QtWidgets.QPlainTextEdit()
+        layout.addWidget(self.results)
 
         # Maintain running threads and aggregated transcript
         self.threads: list[QtCore.QThread] = []
         self.aggregator = TranscriptAggregator()
+
+        self.search_button.clicked.connect(self._on_search)
+        self.editorial_button.clicked.connect(self._on_find_editorials)
 
     # Drag and drop events
     def dragEnterEvent(self, event):  # pragma: no cover - relies on GUI runtime
@@ -124,3 +144,23 @@ class MainWindow(QtWidgets.QMainWindow):
         for seg in segments:
             text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
             self.transcript.appendPlainText(text)
+
+    def _on_search(self) -> None:
+        """Search transcript for query text and show results."""
+        query = self.search_bar.text()
+        segments = self.aggregator.get_transcript()
+        results = self.keyword_index.search(segments, query)
+        self._show_results(results)
+
+    def _on_find_editorials(self) -> None:
+        """Show segments matching any stored keyword."""
+        segments = self.aggregator.get_transcript()
+        results = self.keyword_index.find_all_editorial(segments)
+        self._show_results(results)
+
+    def _show_results(self, segments: list) -> None:
+        """Display search results in the results pane."""
+        self.results.appendPlainText("---")
+        for seg in segments:
+            text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
+            self.results.appendPlainText(text)
