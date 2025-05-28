@@ -6,6 +6,7 @@ import os
 import sys
 import subprocess
 import importlib.util
+import shutil
 
 
 def ensure_pyside6() -> None:
@@ -17,6 +18,17 @@ def ensure_pyside6() -> None:
 
 
 ensure_pyside6()
+
+
+def ensure_ffmpeg() -> None:
+    """Install FFmpeg if it's not already available."""
+    if shutil.which("ffmpeg") is None:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "ffmpeg-static"], check=False
+        )
+
+
+ensure_ffmpeg()
 
 from PySide6 import QtCore
 
