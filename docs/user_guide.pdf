@@ -1,32 +1,18 @@
 %PDF-1.4
 1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
+<< /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
 endobj
 3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
-/Resources <<
-/Font << /F1 5 0 R >>
->>
->>
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>
 endobj
 4 0 obj
-<<
-/Length 828
->>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 828 >>
 stream
 BT
 /F1 18 Tf
@@ -36,25 +22,18 @@ BT
 72 718 Td (1. Install Python and FFmpeg.) Tj
 72 704 Td (2. Run 'python build_installer.py' to create the executable.) Tj
 72 690 Td (3. Launch the installer from 'dist/'.) Tj
-72 660 Td (Basic Usage:) Tj
-72 646 Td (1. Drag audio files into the file list in order.) Tj
-72 632 Td (2. Click 'Transcribe' to process the files.) Tj
-72 618 Td (3. Search or highlight segments in the transcript.) Tj
-72 588 Td (Exporting:) Tj
-72 574 Td (Use the Export buttons to save TXT, JSON, SRT, or a clipped audio segment.) Tj
-72 544 Td (Keyword Management:) Tj
-72 530 Td (Edit 'keywords.json' via the Settings dialog to update search terms.) Tj
-72 500 Td (Uninstallation:) Tj
-72 486 Td (Run 'python src/uninstaller.py' to remove dependencies.) Tj
+72 662 Td (Basic Usage:) Tj
+72 648 Td (1. Drag audio files into the file list in order.) Tj
+72 634 Td (2. Click 'Transcribe' to process the files.) Tj
+72 620 Td (3. Search or highlight segments in the transcript.) Tj
+72 592 Td (Exporting:) Tj
+72 578 Td (Use the Export buttons to save TXT, JSON, SRT, or a clipped audio segment.) Tj
+72 550 Td (Keyword Management:) Tj
+72 536 Td (Edit 'keywords.json' via the Settings dialog to update search terms.) Tj
+72 508 Td (Uninstallation:) Tj
+72 494 Td (Run 'python src/uninstaller.py' to remove dependencies.) Tj
 ET
 endstream
-endobj
-5 0 obj
-<<
-/Type /Font
-/Subtype /Type1
-/BaseFont /Helvetica
->>
 endobj
 xref
 0 6
@@ -63,9 +42,8 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000001120 00000 n 
-trailer
-<< /Size 6 /Root 1 0 R >>
+0000000311 00000 n 
+trailer << /Size 6 /Root 1 0 R >>
 startxref
 1190
 %%EOF

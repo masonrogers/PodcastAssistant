@@ -7,6 +7,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ### Added
 
 ### Changed
+ - Regenerated `docs/user_guide.pdf` so the full instructions display
+   correctly in standard PDF viewers.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
