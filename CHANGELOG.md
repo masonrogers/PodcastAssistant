@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
   highlighted segment can be saved along with a clipped audio file.
 - File list now allows drag-and-drop reordering, and processing respects the
   arranged sequence.
+- Rename Speakers dialog allows updating speaker labels and exports reflect the
+  new names.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

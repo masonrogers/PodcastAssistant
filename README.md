@@ -66,7 +66,12 @@ Below the search bar is a row of **Export** buttons.
   dialog.
 - To export a single segment, highlight its line in the transcript and click
   **Export Segment**. The text is written to the selected ``.txt`` file and a
-  clipped ``.wav`` with the same base name is created.
+
+## Renaming Speakers
+
+Click **Rename Speakers** to change the automatically detected speaker labels.
+Each name is shown in a prompt where you can enter a new label. The transcript
+pane and any exports will reflect the updated names.
 
 ## 4 — If an AI Agent Will Write the Code
 

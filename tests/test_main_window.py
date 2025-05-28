@@ -457,3 +457,59 @@ def test_export_segment_invokes_clip(monkeypatch):
 
     assert txt_called['segs'] == [segs[0]]
     assert clip_calls['args'] == ('a.wav', 0.0, 1.0, 'seg.wav')
+
+
+def test_rename_speakers_updates_export(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    class FakeDialog:
+        calls = [("Host", True), ("Guest", True)]
+        index = 0
+
+        @staticmethod
+        def getText(*a, **k):
+            res = FakeDialog.calls[FakeDialog.index]
+            FakeDialog.index += 1
+            return res
+
+    stubs['PySide6.QtWidgets'].QInputDialog = FakeDialog
+
+    exported = {}
+    te = types.ModuleType('transcript_exporter')
+    te.export_txt = lambda segs: ''
+    def fake_json(segs):
+        exported['data'] = segs
+        return 'j'
+    te.export_json = fake_json
+    te.export_srt = lambda segs: ''
+
+    ce = types.ModuleType('clip_exporter'); ce.ClipExporter = lambda: types.SimpleNamespace()
+    kw = types.ModuleType('keyword_index'); kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st_mod = types.ModuleType('settings'); st_mod.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'transcript_exporter', te)
+    monkeypatch.setitem(sys.modules, 'clip_exporter', ce)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st_mod)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    monkeypatch.setattr(stubs['PySide6.QtWidgets'].QFileDialog, 'getSaveFileName', staticmethod(lambda *a, **k: ('out.json', '')))
+
+    m = importlib.import_module('main_window'); m = importlib.reload(m)
+    window = m.MainWindow()
+    segs = [
+        {'speaker': 'Spk1', 'text': 'hello', 'start': 0.0, 'end': 1.0, 'file': 'a.wav'},
+        {'speaker': 'Spk2', 'text': 'bye', 'start': 1.0, 'end': 2.0, 'file': 'a.wav'},
+    ]
+    window.aggregator.add_segments('a.wav', segs)
+    window.display_segments(segs)
+
+    window._on_rename_speakers()
+    window._on_export_json()
+
+    assert exported['data'][0]['speaker'] == 'Host'
+    assert exported['data'][1]['speaker'] == 'Guest'

@@ -30,3 +30,19 @@ def test_transcript_aggregator_merges_and_sorts():
     ]
 
     assert transcript == expected
+
+
+def test_transcript_aggregator_rename_speaker():
+    agg_module = importlib.import_module('transcript_aggregator')
+    agg_module = importlib.reload(agg_module)
+    aggregator = agg_module.TranscriptAggregator()
+
+    segments = [
+        {'start': 0.0, 'end': 1.0, 'speaker': 'S1', 'text': 'Hi'},
+        {'start': 1.0, 'end': 2.0, 'speaker': 'S2', 'text': 'Bye'},
+    ]
+    aggregator.add_segments('a.wav', segments)
+    aggregator.rename_speaker('S1', 'Host')
+
+    result = aggregator.get_transcript()
+    assert result[0]['speaker'] == 'Host'

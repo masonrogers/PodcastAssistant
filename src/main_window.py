@@ -83,10 +83,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.export_json_button = QtWidgets.QPushButton("Export JSON")
         self.export_srt_button = QtWidgets.QPushButton("Export SRT")
         self.export_segment_button = QtWidgets.QPushButton("Export Segment")
+        self.rename_button = QtWidgets.QPushButton("Rename Speakers")
         export_row.addWidget(self.export_txt_button)
         export_row.addWidget(self.export_json_button)
         export_row.addWidget(self.export_srt_button)
         export_row.addWidget(self.export_segment_button)
+        export_row.addWidget(self.rename_button)
         layout.addLayout(export_row)
 
         self.process_button = QtWidgets.QPushButton("Process Files")
@@ -111,6 +113,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.export_json_button.clicked.connect(self._on_export_json)
         self.export_srt_button.clicked.connect(self._on_export_srt)
         self.export_segment_button.clicked.connect(self._on_export_segment)
+        self.rename_button.clicked.connect(self._on_rename_speakers)
         self.process_button.clicked.connect(self.start_processing)
 
     # Drag and drop events
@@ -209,6 +212,31 @@ class MainWindow(QtWidgets.QMainWindow):
         for seg in segments:
             text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
             self.results.appendPlainText(text)
+
+    def _refresh_transcript_display(self) -> None:
+        """Refresh the transcript pane to reflect stored segments."""
+        if hasattr(self.transcript, "clear"):
+            self.transcript.clear()
+        else:  # test stub
+            self.transcript._text = ""
+        for seg in self.aggregator.get_transcript():
+            text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}"
+            self.transcript.appendPlainText(text)
+
+    def _on_rename_speakers(self) -> None:
+        """Prompt user to rename each detected speaker."""
+        segments = self.aggregator.get_transcript()
+        names = sorted({seg.get("speaker", "") for seg in segments})
+        for name in names:
+            new, ok = QtWidgets.QInputDialog.getText(
+                self,
+                "Rename Speaker",
+                f"Enter new name for {name}",
+                text=name,
+            )
+            if ok and new and new != name:
+                self.aggregator.rename_speaker(name, new)
+        self._refresh_transcript_display()
 
     # Export helpers
     def _export_transcript(self, exporter, filter_mask: str) -> None:
