@@ -21,10 +21,14 @@ ensure_pyside6()
 
 
 def ensure_ffmpeg() -> None:
-    """Install FFmpeg if it's not already available."""
+    """Install FFmpeg and its Python wrapper if they're not available."""
     if shutil.which("ffmpeg") is None:
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "ffmpeg-static"], check=False
+        )
+    if importlib.util.find_spec("ffmpeg") is None:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "ffmpeg-python"], check=False
         )
 
 

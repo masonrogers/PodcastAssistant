@@ -103,8 +103,14 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
     monkeypatch.setattr(subprocess, 'run', fake_run)
     monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
 
-    # PySide6 missing -> installation should occur
-    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: None)
+    # PySide6 missing -> installation should occur. FFmpeg is present so no
+    # additional packages are installed.
+    def fake_find_spec(name):
+        if name == 'PySide6':
+            return None
+        return object()
+
+    monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
     bs_module = importlib.import_module('bootstrapper')
     bs_module = importlib.reload(bs_module)
 
@@ -119,7 +125,7 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
 
 
 def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch):
-    """ensure_ffmpeg installs ffmpeg-static only if FFmpeg is missing."""
+    """ensure_ffmpeg installs ffmpeg dependencies only when missing."""
     stubs = make_pyside6_stub()
     for name, module in stubs.items():
         monkeypatch.setitem(sys.modules, name, module)
@@ -132,17 +138,24 @@ def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch)
     import subprocess
     monkeypatch.setattr(subprocess, 'run', fake_run)
 
-    # FFmpeg missing -> installation should occur
-    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
+    # FFmpeg and module missing -> installation should occur
+    def fake_find_spec(name):
+        return None if name == 'ffmpeg' else object()
+
+    monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
     monkeypatch.setattr(shutil, 'which', lambda name: None)
     bs_module = importlib.import_module('bootstrapper')
     bs_module = importlib.reload(bs_module)
 
-    assert runs == [[sys.executable, '-m', 'pip', 'install', 'ffmpeg-static']]
+    assert runs == [
+        [sys.executable, '-m', 'pip', 'install', 'ffmpeg-static'],
+        [sys.executable, '-m', 'pip', 'install', 'ffmpeg-python'],
+    ]
 
     # FFmpeg present -> no installation attempt
     runs.clear()
     monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
     bs_module.ensure_ffmpeg()
 
     assert runs == []

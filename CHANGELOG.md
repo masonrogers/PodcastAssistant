@@ -6,6 +6,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ## [Unreleased]
 ### Added
 - `ensure_ffmpeg()` installs `ffmpeg-static` automatically when FFmpeg is not present.
+- `ensure_ffmpeg()` installs `ffmpeg-python` automatically when the Python wrapper is missing.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator

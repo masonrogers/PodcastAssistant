@@ -3,8 +3,10 @@
 ## 1 — Core Functionality
 
 - On startup, the bootstrapper first ensures PySide6 and FFmpeg are installed so the Qt
-  progress window can launch. The window then installs any remaining
-  dependencies with a progress bar before starting the main application.
+  progress window can launch. This includes installing `ffmpeg-static` for the
+  executable and `ffmpeg-python` for the wrapper if they are missing. The window
+  then installs any remaining dependencies with a progress bar before starting
+  the main application.
 - Accept multiple audio files (browse or drag-drop). The file list supports
   drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
