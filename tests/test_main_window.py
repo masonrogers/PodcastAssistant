@@ -19,13 +19,32 @@ def make_pyside6_stub():
 
     class Signal:
         def __init__(self, *a):
-            pass
+            self._slots = []
 
         def connect(self, slot):
-            pass
+            self._slots.append(slot)
 
         def emit(self, *args):
-            pass
+            for s in list(self._slots):
+                s(*args)
+
+    class QThread(StubObject):
+        def start(self):
+            if hasattr(self, "run"):
+                self.run()
+
+    class QPlainTextEdit(StubObject):
+        def __init__(self, *a, **kw):
+            super().__init__(*a, **kw)
+            self._text = ""
+
+        def appendPlainText(self, t):
+            if self._text:
+                self._text += "\n"
+            self._text += t
+
+        def toPlainText(self):
+            return self._text
 
     qtwidgets = types.ModuleType('PySide6.QtWidgets')
     for cls in [
@@ -33,16 +52,16 @@ def make_pyside6_stub():
         'QMainWindow',
         'QVBoxLayout',
         'QListWidget',
-        'QPlainTextEdit',
         'QProgressBar',
         'QListWidgetItem',
         'QHBoxLayout',
         'QLabel',
     ]:
         qtwidgets.__dict__[cls] = type(cls, (StubObject,), {})
+    qtwidgets.QPlainTextEdit = QPlainTextEdit
 
     qtcore = types.ModuleType('PySide6.QtCore')
-    qtcore.QThread = type('QThread', (StubObject,), {'start': lambda self: None})
+    qtcore.QThread = QThread
     qtcore.QObject = StubObject
     qtcore.Signal = Signal
 
@@ -69,3 +88,40 @@ def test_main_window_instantiates(monkeypatch):
 
     window = mw_module.MainWindow()
     assert window is not None
+
+
+def test_add_file_triggers_threads(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    class FakeTranscribeWorker:
+        def __init__(self, *a, **k):
+            pass
+
+        def transcribe(self, path):
+            return [{"start": 0.0, "end": 1.0, "speaker": "", "text": "hi"}]
+
+    class FakeDiarizer:
+        def __init__(self, *a, **k):
+            pass
+
+        def assign_speakers(self, audio_path, segments):
+            for s in segments:
+                s["speaker"] = "Spk1"
+            return segments
+
+    tw = types.ModuleType("transcribe_worker")
+    tw.TranscribeWorker = FakeTranscribeWorker
+    dr = types.ModuleType("diarizer")
+    dr.Diarizer = FakeDiarizer
+    monkeypatch.setitem(sys.modules, "transcribe_worker", tw)
+    monkeypatch.setitem(sys.modules, "diarizer", dr)
+
+    mw_module = importlib.import_module("main_window")
+    mw_module = importlib.reload(mw_module)
+
+    window = mw_module.MainWindow()
+    window.add_file("a.wav")
+
+    assert "[Spk1] hi" in window.transcript.toPlainText()
