@@ -77,7 +77,9 @@ pane and any exports will reflect the updated names.
 
 Use the **Settings** button to adjust application options. The dialog lets you
 choose a new path for `keywords.json` and edit UI preferences such as the
-`theme` setting. Changes are saved to
+`theme` setting. An example file is provided at `docs/keywords.json`. Load this
+file or edit it to include your own terms by browsing to its location in the
+Settings dialog. Changes are saved to
 `%APPDATA%\WhisperTranscriber\settings.json` and take effect the next time the
 application is launched.
 

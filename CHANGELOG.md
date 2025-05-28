@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
     saved values reloaded on restart.
 - Tests now verify that `ensure_pyside6()` installs PySide6 only when it's
   missing.
+- Example `keywords.json` added in `docs/` and README updated with instructions
+  for loading or editing it via the Settings dialog.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch
