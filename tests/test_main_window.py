@@ -37,6 +37,7 @@ def make_pyside6_stub():
         def __init__(self, *a, **kw):
             super().__init__(*a, **kw)
             self._text = ""
+            self._selected_line = 0
 
         def appendPlainText(self, t):
             if self._text:
@@ -45,6 +46,18 @@ def make_pyside6_stub():
 
         def toPlainText(self):
             return self._text
+
+        def textCursor(self):
+            parent = self
+
+            class Cursor:
+                def blockNumber(self):
+                    return parent._selected_line
+
+            return Cursor()
+
+        def set_selected_line(self, line):
+            self._selected_line = line
 
     class QLineEdit(StubObject):
         def __init__(self, *a, **kw):
@@ -61,6 +74,11 @@ def make_pyside6_stub():
         def __init__(self, *a, **kw):
             super().__init__(*a, **kw)
             self.clicked = Signal()
+
+    class QFileDialog(StubObject):
+        @staticmethod
+        def getSaveFileName(*a, **kw):
+            return ("", "")
 
     qtwidgets = types.ModuleType('PySide6.QtWidgets')
     for cls in [
@@ -79,6 +97,7 @@ def make_pyside6_stub():
     qtwidgets.QPlainTextEdit = QPlainTextEdit
     qtwidgets.QLineEdit = QLineEdit
     qtwidgets.QPushButton = QPushButton
+    qtwidgets.QFileDialog = QFileDialog
 
     qtcore = types.ModuleType('PySide6.QtCore')
     qtcore.QThread = QThread
@@ -236,3 +255,104 @@ def test_find_editorials_displays_results(monkeypatch):
 
     assert 'ad spot' in window.results.toPlainText()
     assert window.keyword_index.called is True
+
+
+def test_export_full_transcript_invokes_exporters(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    te = types.ModuleType('transcript_exporter')
+    called = {}
+    def fake_txt(segs):
+        called['txt'] = segs
+        return 't'
+    def fake_json(segs):
+        called['json'] = segs
+        return 'j'
+    def fake_srt(segs):
+        called['srt'] = segs
+        return 's'
+    te.export_txt = fake_txt
+    te.export_json = fake_json
+    te.export_srt = fake_srt
+
+    ce = types.ModuleType('clip_exporter'); ce.ClipExporter = lambda: types.SimpleNamespace(export_clip=lambda *a, **k: None)
+    kw = types.ModuleType('keyword_index'); kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st_mod = types.ModuleType('settings'); st_mod.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'transcript_exporter', te)
+    monkeypatch.setitem(sys.modules, 'clip_exporter', ce)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st_mod)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    monkeypatch.setattr(stubs['PySide6.QtWidgets'].QFileDialog, 'getSaveFileName', staticmethod(lambda *a, **k: ('out.txt', '')))
+    m = importlib.import_module('main_window'); m = importlib.reload(m)
+    window = m.MainWindow()
+    segs = [{'speaker':'S1','text':'hi'}]
+    window.aggregator.add_segments('a.wav', segs)
+    expected = window.aggregator.get_transcript()
+
+    mo = importlib.import_module('builtins')
+    from unittest.mock import mock_open
+    monkeypatch.setattr(mo, 'open', mock_open())
+
+    window._on_export_txt()
+    window._on_export_json()
+    window._on_export_srt()
+
+    assert called['txt'] == expected
+    assert called['json'] == expected
+    assert called['srt'] == expected
+
+
+def test_export_segment_invokes_clip(monkeypatch):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    txt_called = {}
+    te = types.ModuleType('transcript_exporter')
+    def fake_txt(segs):
+        txt_called['segs'] = segs
+        return 't'
+    te.export_txt = fake_txt
+    te.export_json = lambda segs: ''
+    te.export_srt = lambda segs: ''
+
+    clip_calls = {}
+    class FakeClip:
+        def export_clip(self, audio_path, start, end, dest):
+            clip_calls['args'] = (audio_path, start, end, dest)
+
+    ce = types.ModuleType('clip_exporter'); ce.ClipExporter = lambda: FakeClip()
+    kw = types.ModuleType('keyword_index'); kw.KeywordIndex = lambda path: types.SimpleNamespace(search=lambda s,q: [], find_all_editorial=lambda s: [])
+    st_mod = types.ModuleType('settings'); st_mod.Settings = lambda *a, **k: types.SimpleNamespace(keyword_path='kw.json')
+    tw = types.ModuleType('transcribe_worker'); tw.TranscribeWorker = lambda *a, **k: None
+    dr = types.ModuleType('diarizer'); dr.Diarizer = lambda *a, **k: None
+    monkeypatch.setitem(sys.modules, 'transcript_exporter', te)
+    monkeypatch.setitem(sys.modules, 'clip_exporter', ce)
+    monkeypatch.setitem(sys.modules, 'keyword_index', kw)
+    monkeypatch.setitem(sys.modules, 'settings', st_mod)
+    monkeypatch.setitem(sys.modules, 'transcribe_worker', tw)
+    monkeypatch.setitem(sys.modules, 'diarizer', dr)
+
+    monkeypatch.setattr(stubs['PySide6.QtWidgets'].QFileDialog, 'getSaveFileName', staticmethod(lambda *a, **k: ('seg.txt', '')))
+    m = importlib.import_module('main_window'); m = importlib.reload(m)
+    window = m.MainWindow()
+    segs = [{'speaker':'S1','text':'hi','start':0.0,'end':1.0,'file':'a.wav'}]
+    window.aggregator.add_segments('a.wav', segs)
+    window.display_segments(segs)
+    window.transcript.set_selected_line(0)
+
+    mo = importlib.import_module('builtins')
+    from unittest.mock import mock_open
+    monkeypatch.setattr(mo, 'open', mock_open())
+
+    window._on_export_segment()
+
+    assert txt_called['segs'] == [segs[0]]
+    assert clip_calls['args'] == ('a.wav', 0.0, 1.0, 'seg.wav')

@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from PySide6 import QtWidgets, QtCore
 
+from transcript_exporter import export_txt, export_json, export_srt
+from clip_exporter import ClipExporter
+
 from settings import Settings
 from keyword_index import KeywordIndex
 
@@ -72,6 +75,17 @@ class MainWindow(QtWidgets.QMainWindow):
         search_row.addWidget(self.editorial_button)
         layout.addLayout(search_row)
 
+        export_row = QtWidgets.QHBoxLayout()
+        self.export_txt_button = QtWidgets.QPushButton("Export TXT")
+        self.export_json_button = QtWidgets.QPushButton("Export JSON")
+        self.export_srt_button = QtWidgets.QPushButton("Export SRT")
+        self.export_segment_button = QtWidgets.QPushButton("Export Segment")
+        export_row.addWidget(self.export_txt_button)
+        export_row.addWidget(self.export_json_button)
+        export_row.addWidget(self.export_srt_button)
+        export_row.addWidget(self.export_segment_button)
+        layout.addLayout(export_row)
+
         self.transcript = QtWidgets.QPlainTextEdit()
         layout.addWidget(self.transcript)
 
@@ -81,9 +95,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # Maintain running threads and aggregated transcript
         self.threads: list[QtCore.QThread] = []
         self.aggregator = TranscriptAggregator()
+        self.clip_exporter = ClipExporter()
 
         self.search_button.clicked.connect(self._on_search)
         self.editorial_button.clicked.connect(self._on_find_editorials)
+        self.export_txt_button.clicked.connect(self._on_export_txt)
+        self.export_json_button.clicked.connect(self._on_export_json)
+        self.export_srt_button.clicked.connect(self._on_export_srt)
+        self.export_segment_button.clicked.connect(self._on_export_segment)
 
     # Drag and drop events
     def dragEnterEvent(self, event):  # pragma: no cover - relies on GUI runtime
@@ -164,3 +183,43 @@ class MainWindow(QtWidgets.QMainWindow):
         for seg in segments:
             text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
             self.results.appendPlainText(text)
+
+    # Export helpers
+    def _export_transcript(self, exporter, filter_mask: str) -> None:
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Transcript", "", filter_mask)
+        if not path:
+            return
+        segments = self.aggregator.get_transcript()
+        data = exporter(segments)
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(data)
+
+    def _on_export_txt(self) -> None:
+        self._export_transcript(export_txt, "Text Files (*.txt)")
+
+    def _on_export_json(self) -> None:
+        self._export_transcript(export_json, "JSON Files (*.json)")
+
+    def _on_export_srt(self) -> None:
+        self._export_transcript(export_srt, "SubRip (*.srt)")
+
+    def _selected_segment(self):
+        cursor = self.transcript.textCursor()
+        line = cursor.blockNumber()
+        segments = self.aggregator.get_transcript()
+        if 0 <= line < len(segments):
+            return segments[line]
+        return None
+
+    def _on_export_segment(self) -> None:
+        seg = self._selected_segment()
+        if not seg:
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Segment", "", "Text Files (*.txt)")
+        if not path:
+            return
+        text = export_txt([seg])
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        audio_path = path.rsplit(".", 1)[0] + ".wav"
+        self.clip_exporter.export_clip(seg.get("file", ""), seg.get("start", 0.0), seg.get("end", 0.0), audio_path)

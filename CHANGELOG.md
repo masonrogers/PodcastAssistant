@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Uninstaller removes packages installed by the bootstrapper during uninstall.
 - Main window loads keywords from the path in `Settings` and provides a search
   bar plus a **Find Editorials** button to display matching transcript segments.
+- Export buttons allow saving the full transcript as TXT, JSON or SRT. A
+  highlighted segment can be saved along with a clipped audio file.
 
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch

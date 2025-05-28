@@ -56,6 +56,17 @@ Enter text in the bar and click **Search** to show transcript segments containin
 that phrase. **Find Editorials** lists segments matching any keywords loaded from
 `keywords.json`. Results appear in a pane beneath the transcript.
 
+## Exporting Transcripts
+
+Below the search bar is a row of **Export** buttons.
+
+- **Export TXT**, **Export JSON** and **Export SRT** save the entire transcript
+  in the chosen format. After clicking, select the destination path in the file
+  dialog.
+- To export a single segment, highlight its line in the transcript and click
+  **Export Segment**. The text is written to the selected ``.txt`` file and a
+  clipped ``.wav`` with the same base name is created.
+
 ## 4 — If an AI Agent Will Write the Code
 
 - Supply acceptance tests (pytest) that cover every feature above.
