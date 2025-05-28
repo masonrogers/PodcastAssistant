@@ -6,6 +6,7 @@ from PySide6 import QtWidgets, QtCore
 
 from transcribe_worker import TranscribeWorker
 from diarizer import Diarizer
+from transcript_aggregator import TranscriptAggregator
 
 
 class TranscriberThread(QtCore.QThread):
@@ -60,6 +61,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.transcript = QtWidgets.QPlainTextEdit()
         layout.addWidget(self.transcript)
 
+        # Maintain running threads and aggregated transcript
+        self.threads: list[QtCore.QThread] = []
+        self.aggregator = TranscriptAggregator()
+
     # Drag and drop events
     def dragEnterEvent(self, event):  # pragma: no cover - relies on GUI runtime
         if event.mimeData().hasUrls():
@@ -82,6 +87,30 @@ class MainWindow(QtWidgets.QMainWindow):
         h.addWidget(progress)
         self.file_list.addItem(item)
         self.file_list.setItemWidget(item, widget)
+        # Start transcription and diarization threads
+        t_thread = TranscriberThread(path, parent=self)
+        self.threads.append(t_thread)
+        t_thread.progress.connect(lambda p: progress.setValue(int(p * 50)))
+
+        def on_transcribed(segs: list) -> None:
+            d_thread = DiarizerThread(path, segs, parent=self)
+            self.threads.append(d_thread)
+            d_thread.progress.connect(
+                lambda p: progress.setValue(50 + int(p * 50))
+            )
+            d_thread.finished.connect(
+                lambda labeled: self._on_diarized(path, labeled, progress)
+            )
+            d_thread.start()
+
+        t_thread.finished.connect(on_transcribed)
+        t_thread.start()
+
+    def _on_diarized(self, path: str, segments: list, progress: QtWidgets.QProgressBar) -> None:
+        """Handle diarization completion for a file."""
+        self.aggregator.add_segments(path, segments)
+        self.display_segments(segments)
+        progress.setValue(100)
 
     # Placeholder hooks for workers
     def start_transcription(self, path: str) -> None:
