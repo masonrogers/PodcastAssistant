@@ -7,8 +7,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ### Added
 
 ### Changed
- - Regenerated `docs/user_guide.pdf` so the full instructions display
-   correctly in standard PDF viewers.
+ - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
+   script now writes `docs/user_guide.txt` instead of a PDF and the PDF file was
+   removed from the repository.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
