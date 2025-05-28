@@ -116,6 +116,18 @@ The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
 binary in an NSIS installer.
 
+## Contributor Resources
+
+The `prompts/` directory contains text prompts used by the automation
+agents:
+
+- `prompts/system_prompt.txt`
+- `prompts/developer_prompt.txt`
+- `prompts/contributor_tasks.txt`
+
+Guidelines for verifying changes before submission are provided in
+[`self_review_checklist.md`](self_review_checklist.md).
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
