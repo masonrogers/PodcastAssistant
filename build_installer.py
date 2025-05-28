@@ -7,6 +7,8 @@ def main() -> None:
     PyInstaller.__main__.run(
         [
             "src/run_app.py",
+            "--paths",
+            "src",
             "--name=WhisperTranscriber",
             "--onefile",
             "--windowed",
