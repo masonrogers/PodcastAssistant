@@ -26,4 +26,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Bootstrapper now installs PySide6 first so the progress window can launch
   before installing remaining dependencies.
+- Uninstaller now invokes the bundled Python interpreter via
+  `WhisperTranscriber.exe uninstaller.py` instead of calling `$INSTDIR\python.exe`.
 
