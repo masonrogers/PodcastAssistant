@@ -11,6 +11,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
    script now writes `docs/user_guide.txt` instead of a PDF and the PDF file was
    removed from the repository.
+ - `build_installer.py` now passes `--paths src` to `PyInstaller.__main__.run`
+   so bundled executables can import the `bootstrapper` module without errors.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
