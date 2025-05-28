@@ -11,8 +11,9 @@
 - After all files finish, enable keyword search and a “Find all editorials” button using a persistent keyword list.
 - Export options:
   - Full transcript → TXT, JSON, SRT
-  - Highlighted segment → same text formats plus clipped audio (FFmpeg).
+- Highlighted segment → same text formats plus clipped audio (FFmpeg).
 - Entirely offline / internal use; no data leaves the machine.
+- Uninstallation cleans up any dependencies installed by the bootstrapper.
 
 ## 2 — Technology Stack
 
@@ -39,6 +40,7 @@
 | `Settings`            | Persists UI prefs & keyword path                       |
 | `Bootstrapper`        | Checks dependencies and installs missing packages with a progress dialog |
 | `Installer`           | NSIS script for final .exe                             |
+| `uninstaller.py`      | Removes packages during uninstall |
 The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides
 `export_clip(audio_path, start, end, dest_path)` for saving short audio clips.
 

@@ -9,4 +9,5 @@ All notable changes to this project will be documented in this file.
 - Project plan updated to cover automatic dependency bootstrapping with progress dialog.
 - Runtime bootstrapper installs dependencies listed in `requirements.txt` at
   startup with a progress dialog before launching the main window.
+- Uninstaller removes packages installed by the bootstrapper during uninstall.
 

@@ -13,6 +13,7 @@ Section "MainSection" SEC01
 SectionEnd
 
 Section "Uninstall"
+    Exec '"$INSTDIR\python.exe" "$INSTDIR\uninstaller.py"'
     Delete "$INSTDIR\WhisperTranscriber.exe"
     Delete "$INSTDIR\Uninstall.exe"
     RMDir "$INSTDIR"
