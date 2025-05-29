@@ -10,10 +10,11 @@ import shutil
 
 
 def pip_install(package: str) -> int:
-    """Install *package* using pip's internal API."""
-    from pip._internal.cli.main import main as pip_main
-
-    return pip_main(["install", package])
+    """Install *package* using pip via a subprocess."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", package]
+    )
+    return result.returncode
 
 
 def ensure_pyside6() -> None:

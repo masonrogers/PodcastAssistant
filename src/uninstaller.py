@@ -8,10 +8,11 @@ import subprocess
 
 
 def pip_uninstall(package: str) -> int:
-    """Uninstall *package* using pip's internal API."""
-    from pip._internal.cli.main import main as pip_main
-
-    return pip_main(["uninstall", "-y", package])
+    """Uninstall *package* using pip via a subprocess."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "uninstall", "-y", package]
+    )
+    return result.returncode
 
 
 def uninstall_packages(requirements_path: str) -> None:
