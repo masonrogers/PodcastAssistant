@@ -3,6 +3,7 @@ import sys
 import types
 import importlib
 import shutil
+import subprocess
 
 # add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -59,13 +60,16 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
 
     runs = []
 
-    def fake_main(args):
-        runs.append(args[1])
+    class Result:
+        returncode = 0
+
+    def fake_run(cmd, *a, **kw):
+        runs.append(cmd[-1])
+        return Result()
 
     monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
     monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
-    from pip._internal.cli import main as pip_main_module
-    monkeypatch.setattr(pip_main_module, 'main', lambda args: fake_main(args))
+    monkeypatch.setattr(subprocess, 'run', fake_run)
 
     req_path = tmp_path / 'reqs.txt'
     req_path.write_text('pkgA\npkgB\npkgC\n')
@@ -93,12 +97,15 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
 
     runs = []
 
-    def fake_main(args):
-        runs.append(args[1])
+    class Result:
+        returncode = 0
+
+    def fake_run(cmd, *a, **kw):
+        runs.append(cmd[-1])
+        return Result()
 
     monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
-    from pip._internal.cli import main as pip_main_module
-    monkeypatch.setattr(pip_main_module, 'main', lambda args: fake_main(args))
+    monkeypatch.setattr(subprocess, 'run', fake_run)
 
     # PySide6 missing -> installation should occur. FFmpeg is present so no
     # additional packages are installed.
@@ -111,6 +118,8 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
     sys.modules.pop('bootstrapper', None)
     bs_module = importlib.import_module('bootstrapper')
 
+    assert runs == []
+    bs_module.ensure_pyside6()
     assert runs == ['PySide6']
 
     # PySide6 present -> no installation attempt
@@ -129,8 +138,12 @@ def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch)
 
     runs = []
 
-    def fake_main(args):
-        runs.append(args[1])
+    class Result:
+        returncode = 0
+
+    def fake_run(cmd, *a, **kw):
+        runs.append(cmd[-1])
+        return Result()
 
     # FFmpeg and module missing -> installation should occur
     def fake_find_spec(name):
@@ -138,11 +151,12 @@ def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch)
 
     monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
     monkeypatch.setattr(shutil, 'which', lambda name: None)
-    from pip._internal.cli import main as pip_main_module
-    monkeypatch.setattr(pip_main_module, 'main', lambda args: fake_main(args))
+    monkeypatch.setattr(subprocess, 'run', fake_run)
     sys.modules.pop('bootstrapper', None)
     bs_module = importlib.import_module('bootstrapper')
 
+    assert runs == []
+    bs_module.ensure_ffmpeg()
     assert runs == [
         'ffmpeg-static',
         'ffmpeg-python',

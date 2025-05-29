@@ -10,10 +10,11 @@ import shutil
 
 
 def pip_install(package: str) -> int:
-    """Install *package* using pip's internal API."""
-    from pip._internal.cli.main import main as pip_main
-
-    return pip_main(["install", package])
+    """Install *package* using pip via a subprocess."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", package]
+    )
+    return result.returncode
 
 
 def ensure_pyside6() -> None:
@@ -22,18 +23,12 @@ def ensure_pyside6() -> None:
         pip_install("PySide6")
 
 
-ensure_pyside6()
-
-
 def ensure_ffmpeg() -> None:
     """Install FFmpeg and its Python wrapper if they're not available."""
     if shutil.which("ffmpeg") is None:
         pip_install("ffmpeg-static")
     if importlib.util.find_spec("ffmpeg") is None:
         pip_install("ffmpeg-python")
-
-
-ensure_ffmpeg()
 
 from PySide6 import QtCore
 
