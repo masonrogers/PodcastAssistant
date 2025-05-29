@@ -1,14 +1,9 @@
 Whisper Transcriber User Guide
 
-Prerequisites:
-- Python 3.10 or 3.11. Newer versions may not have wheels for `whispercpp`.
-
 Installation:
-1. Install Python. FFmpeg will be installed automatically by the bootstrapper.
+1. Install Python and FFmpeg.
 2. Run 'python build_installer.py' to create the executable.
 3. Launch the installer from 'dist/'.
-4. If any dependency fails to install, the bootstrapper stops and shows an error
-   message so you can check the logs.
 
 Basic Usage:
 1. Drag audio files into the file list in order.
@@ -22,4 +17,4 @@ Keyword Management:
 Edit 'keywords.json' via the Settings dialog to update search terms.
 
 Uninstallation:
-Run 'python src/uninstaller.py' to remove dependencies.
+Run 'python src/uninstaller.py' to delete installed files.
