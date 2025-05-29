@@ -124,7 +124,10 @@ executable so the bootstrapper can read it when frozen.
 It further collects all ``whispercpp`` resources so the embedded
 transcription engine works out of the box. The script additionally passes
 ``--collect-binaries=whispercpp`` so the compiled library for the
-transcription engine is included.
+transcription engine is included. A custom hook under ``pyinstaller_hooks/``
+adds ``hook-whispercpp.py`` which collects dynamic libraries for
+``whispercpp``. The build script passes
+``--additional-hooks-dir=pyinstaller_hooks`` so PyInstaller can load this hook.
 
 When running the bundled executable, the bootstrapper checks ``sys.frozen`` and
 loads this bundled ``requirements.txt`` from the executable's directory. When

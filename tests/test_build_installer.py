@@ -63,6 +63,7 @@ def test_build_installer_logs_created(monkeypatch):
     assert f"--add-data=src/uninstaller.py{os.pathsep}." in run_args[0]
     assert "--collect-all=whispercpp" in run_args[0]
     assert "--collect-binaries=whispercpp" in run_args[0]
+    assert "--additional-hooks-dir=pyinstaller_hooks" in run_args[0]
     assert log_file.exists()
     assert 'Starting PyInstaller build' in log_file.read_text()
 
