@@ -56,7 +56,17 @@ class Bootstrapper(QtCore.QThread):
     def __init__(self, requirements_path: str | None = None, parent=None) -> None:
         super().__init__(parent)
         if requirements_path is None:
-            requirements_path = os.path.join(os.path.dirname(__file__), '..', 'requirements.txt')
+            if getattr(sys, 'frozen', False):
+                requirements_path = os.path.join(
+                    os.path.dirname(sys.executable),
+                    'requirements.txt',
+                )
+            else:
+                requirements_path = os.path.join(
+                    os.path.dirname(__file__),
+                    '..',
+                    'requirements.txt',
+                )
         self.requirements_path = os.path.abspath(requirements_path)
 
     def _read_packages(self) -> list[str]:
