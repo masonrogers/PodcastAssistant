@@ -35,17 +35,33 @@ def make_pyside6_stub():
             if hasattr(self, "run"):
                 self.run()
 
+    message_calls = []
+
+    class QMessageBox(StubObject):
+        @staticmethod
+        def critical(parent, title, text):
+            message_calls.append((title, text))
+
     qtcore = types.ModuleType('PySide6.QtCore')
     qtcore.__spec__ = importlib.machinery.ModuleSpec('PySide6.QtCore', loader=None)
     qtcore.QThread = QThread
     qtcore.QObject = StubObject
     qtcore.Signal = Signal
 
+    qtwidgets = types.ModuleType('PySide6.QtWidgets')
+    qtwidgets.QMessageBox = QMessageBox
+    qtwidgets.message_calls = message_calls
+
     pyside6 = types.ModuleType('PySide6')
     pyside6.__spec__ = importlib.machinery.ModuleSpec('PySide6', loader=None)
     pyside6.QtCore = qtcore
+    pyside6.QtWidgets = qtwidgets
 
-    return {'PySide6': pyside6, 'PySide6.QtCore': qtcore}
+    return {
+        'PySide6': pyside6,
+        'PySide6.QtCore': qtcore,
+        'PySide6.QtWidgets': qtwidgets,
+    }
 
 
 def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
@@ -95,6 +111,55 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
     expected_runs = ['pkgA', 'pkgC']
     assert runs == expected_runs
     assert progress == [0.5, 1.0, 'done']
+
+
+def test_bootstrapper_aborts_on_failed_install(monkeypatch, tmp_path):
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    real_import_module = importlib.import_module
+
+    def fake_import_module(name, package=None):
+        if name == 'pkgA':
+            raise ImportError(name)
+        try:
+            return real_import_module(name, package)
+        except ImportError:
+            return types.ModuleType(name)
+
+    runs = []
+
+    class Result:
+        returncode = 1
+
+    def fake_run(cmd, *a, **kw):
+        runs.append(cmd[-1])
+        return Result()
+
+    monkeypatch.setattr(importlib, 'import_module', fake_import_module)
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
+    monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+
+    req_path = tmp_path / 'reqs.txt'
+    req_path.write_text('pkgA\n')
+
+    sys.modules.pop('bootstrapper', None)
+    bs_module = importlib.import_module('bootstrapper')
+    boot = bs_module.Bootstrapper(str(req_path))
+
+    progress = []
+    boot.progress.connect(lambda p: progress.append(p))
+    boot.finished.connect(lambda: progress.append('done'))
+
+    boot.run()
+
+    assert runs == ['pkgA']
+    assert progress == ['done']
+    assert stubs['PySide6.QtWidgets'].message_calls == [
+        ('Installation Error', 'Failed to install pkgA. See logs for details.')
+    ]
 
 
 def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch):
