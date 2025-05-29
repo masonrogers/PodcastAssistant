@@ -99,13 +99,17 @@ application is launched.
 - Source repository with tests, prompts, and README
 - [User Guide](docs/user_guide.txt) with installation and usage instructions
 
+## Prerequisites
+
+- Python 3.10 or 3.11. Newer versions may not have wheels for `whispercpp`.
+
 That’s the entire plan—feature set, tech choices, modules, and deliverables—without any timelines.
 
 ## Building the Installer
 
 ### Prerequisites
 
-- Python with all packages from `requirements.txt`
+- Python 3.10 or 3.11 with all packages from `requirements.txt` (newer versions may not have `whispercpp` wheels)
 - `pyinstaller` available on your PATH (`pip install pyinstaller`)
 - (Optional) [NSIS](https://nsis.sourceforge.io/) for creating the final
   Windows installer.
