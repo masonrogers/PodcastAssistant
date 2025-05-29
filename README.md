@@ -123,6 +123,12 @@ The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
 binary in an NSIS installer.
 
+## Log Files
+
+Application logs are written to the `logs/` directory at the repository root.
+`app.log` stores general runtime messages and `installer_build.log` captures
+output from `build_installer.py`.
+
 ## Contributor Resources
 
 The `prompts/` directory contains text prompts used by the automation
