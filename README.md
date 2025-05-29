@@ -102,10 +102,16 @@ That’s the entire plan—feature set, tech choices, modules, and deliverables�
 
 ### Prerequisites
 
-- Python 3.10 or 3.11 with all packages from `requirements.txt` (newer versions may not have `whispercpp` wheels)
+- Python 3.10 or 3.11 with all packages from `requirements.txt` (newer versions
+  may not have `whispercpp` wheels)
 - `pyinstaller` available on your PATH (`pip install pyinstaller`)
 - (Optional) [NSIS](https://nsis.sourceforge.io/) for creating the final
   Windows installer.
+- Install the project dependencies before building:
+
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 ### Invocation
 
@@ -115,11 +121,10 @@ Run the helper script which invokes PyInstaller:
 python build_installer.py
 ```
 
-The build process bundles pip's CA certificates so that pip can install
-missing packages at runtime. It also packages ``requirements.txt`` next to the
-executable so the application can read it when frozen.
-It further collects all ``whispercpp`` resources so the embedded
-transcription engine works out of the box. The script additionally passes
+All dependencies must be installed prior to running the build script. PyInstaller
+copies these packages into the executable so everything is available at runtime.
+The process also bundles pip's CA certificates and collects all ``whispercpp``
+resources so the embedded transcription engine works out of the box. The script additionally passes
 ``--collect-binaries=whispercpp`` so the compiled library for the
 transcription engine is included. A custom hook under ``pyinstaller_hooks/``
 adds ``hook-whispercpp.py`` which collects dynamic libraries for

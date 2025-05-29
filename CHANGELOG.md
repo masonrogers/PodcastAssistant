@@ -14,12 +14,6 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - Log files are generated per module in `logs/`, such as `app.log` for the main application and `installer_build.log` for the installer builder.
 - Added a `logs/` directory with a `.gitkeep` file so the log folder is tracked in version control.
 - `.gitignore` now excludes log files under `logs/*.log`.
-- `build_installer.py` now packages `requirements.txt` with the executable using
-  PyInstaller's `--add-data` option so the installer includes the dependency list.
-- `build_installer.py` now bundles `src/uninstaller.py` with the executable so
-  the uninstaller can run from the packaged application.
-- `run_app.py` exits early when invoked with `uninstaller.py` and calls
-  `uninstall_packages()` using the bundled `requirements.txt` path.
 - `.gitignore` now excludes PyInstaller-generated `*.spec` files.
 - PyInstaller build now loads `pyinstaller_hooks/hook-whispercpp.py` via
   `--additional-hooks-dir` so WhisperCPP's dynamic libraries bundle correctly.
@@ -50,7 +44,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   message box when running under Qt.
 - `run_app.py` now imports `MainWindow` only after the bootstrapper finishes
    installing packages. This prevents `ModuleNotFoundError` for modules like
-   `whispercpp` when launching the packaged executable.
+  `whispercpp` when launching the packaged executable.
 - `Bootstrapper.__init__` now checks `sys.frozen` and reads `requirements.txt`
   from the executable's directory when running as a PyInstaller bundle.
 - `Bootstrapper._missing_packages` now imports each module with
@@ -61,6 +55,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   includes WhisperCPP resources.
 - `build_installer.py` now passes `--collect-binaries=whispercpp` so the
   transcription engine's binary library is bundled.
+- Dependencies are now installed before building and bundled inside the
+  executable. `build_installer.py` no longer copies `requirements.txt` or
+  `src/uninstaller.py` into the PyInstaller bundle.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,

@@ -59,8 +59,8 @@ def test_build_installer_logs_created(monkeypatch):
     build_installer.main()
 
     assert run_args, 'PyInstaller.run was not called'
-    assert f"--add-data=requirements.txt{os.pathsep}." in run_args[0]
-    assert f"--add-data=src/uninstaller.py{os.pathsep}." in run_args[0]
+    assert f"--add-data=requirements.txt{os.pathsep}." not in run_args[0]
+    assert f"--add-data=src/uninstaller.py{os.pathsep}." not in run_args[0]
     assert "--collect-all=whispercpp" in run_args[0]
     assert "--collect-binaries=whispercpp" in run_args[0]
     assert "--additional-hooks-dir=pyinstaller_hooks" in run_args[0]
