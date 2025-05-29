@@ -123,11 +123,15 @@ The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
 binary in an NSIS installer.
 
-## Log Files
+## Logging
 
-Application logs are written to the `logs/` directory at the repository root.
-`app.log` stores general runtime messages and `installer_build.log` captures
-output from `build_installer.py`.
+All logs are stored in the `logs/` directory in the project root. Each major
+component writes to its own file. The main application logs to `app.log` and the
+installer builder logs to `installer_build.log`. Modules that call
+`get_logger()` create additional files under `logs/`.
+
+The default log level is `INFO`. Edit the `level` fields in
+[`src/logging_setup.py`](src/logging_setup.py) to change verbosity.
 
 ## Contributor Resources
 
