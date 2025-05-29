@@ -14,6 +14,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - Log files are generated per module in `logs/`, such as `app.log` for the main application and `installer_build.log` for the installer builder.
 - Added a `logs/` directory with a `.gitkeep` file so the log folder is tracked in version control.
 - `.gitignore` now excludes log files under `logs/*.log`.
+- `build_installer.py` now bundles `requirements.txt` via PyInstaller's
+  `--add-data` option so the packaged application can access its dependency list.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
