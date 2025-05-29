@@ -5,17 +5,25 @@ from __future__ import annotations
 import os
 import sys
 import subprocess
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def pip_uninstall(package: str) -> int:
-    """Uninstall *package* using pip's internal API."""
-    from pip._internal.cli.main import main as pip_main
-
-    return pip_main(["uninstall", "-y", package])
+    """Uninstall *package* using pip via a subprocess."""
+    logger.info("Uninstalling %s", package)
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "uninstall", "-y", package]
+    )
+    if result.returncode != 0:
+        logger.error("Failed to uninstall %s", package)
+    return result.returncode
 
 
 def uninstall_packages(requirements_path: str) -> None:
     """Read ``requirements_path`` and uninstall each package listed."""
+    logger.info("Uninstalling packages listed in %s", requirements_path)
     with open(requirements_path, 'r', encoding='utf-8') as fh:
         packages = [line.strip() for line in fh if line.strip() and not line.startswith('#')]
 

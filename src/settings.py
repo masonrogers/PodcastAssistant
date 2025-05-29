@@ -11,6 +11,9 @@ Usage:
 import json
 import os
 from typing import Dict
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class Settings:
@@ -21,6 +24,7 @@ class Settings:
             base = os.getenv("APPDATA") or os.path.expanduser("~")
             path = os.path.join(base, "WhisperTranscriber", "settings.json")
         self.path = path
+        logger.debug("Settings file: %s", path)
         self.ui: Dict[str, str] = {}
         self.keyword_path: str = os.path.join(os.path.dirname(self.path), "keywords.json")
         self.load()
@@ -32,12 +36,15 @@ class Settings:
                 data = json.load(fh)
             self.ui = data.get("ui", {})
             self.keyword_path = data.get("keyword_path", self.keyword_path)
+            logger.info("Loaded settings from %s", self.path)
         except FileNotFoundError:
             # defaults already set in __init__
             self.ui = {}
+            logger.info("Settings file not found, using defaults")
 
     def save(self) -> None:
         """Persist current settings to disk."""
+        logger.info("Saving settings to %s", self.path)
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
         with open(self.path, "w", encoding="utf-8") as fh:
             json.dump({"ui": self.ui, "keyword_path": self.keyword_path}, fh, indent=2)

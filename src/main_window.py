@@ -3,6 +3,7 @@ from __future__ import annotations
 """PySide6 GUI for the Podcast Assistant."""
 
 from PySide6 import QtWidgets, QtCore
+from logger import get_logger
 
 from transcript_exporter import export_txt, export_json, export_srt
 from clip_exporter import ClipExporter
@@ -13,6 +14,8 @@ from keyword_index import KeywordIndex
 from transcribe_worker import TranscribeWorker
 from diarizer import Diarizer
 from transcript_aggregator import TranscriptAggregator
+
+logger = get_logger(__name__)
 
 
 class TranscriberThread(QtCore.QThread):
@@ -162,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_file(self, path: str) -> None:
         """Add an audio file entry with a progress bar."""
+        logger.info("Adding file %s", path)
         item = QtWidgets.QListWidgetItem(path)
         widget = QtWidgets.QWidget()
         h = QtWidgets.QHBoxLayout(widget)
@@ -179,6 +183,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Begin processing files in the current list order."""
         if self.processing:
             return
+        logger.info("Starting processing of %d files", self.file_list.count())
         self.processing = True
         self.current_index = 0
         self._process_next()
@@ -186,9 +191,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def _process_next(self) -> None:
         if self.current_index >= self.file_list.count():
             self.processing = False
+            logger.info("Processing complete")
             return
         item = self.file_list.item(self.current_index)
         path, progress = item.data(QtCore.Qt.UserRole)
+        logger.info("Processing file %s", path)
         t_thread = TranscriberThread(path, parent=self)
         self.threads.append(t_thread)
         t_thread.progress.connect(lambda p: progress.setValue(int(p * 50)))
@@ -209,6 +216,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_diarized(self, path: str, segments: list, progress: QtWidgets.QProgressBar) -> None:
         """Handle diarization completion for a file."""
+        logger.info("Diarization complete for %s", path)
         self.aggregator.add_segments(path, segments)
         self.display_segments(segments)
         progress.setValue(100)
@@ -224,6 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_segments(self, segments: list) -> None:
         """Append segments to the transcript display."""
+        logger.debug("Displaying %d segments", len(segments))
         for seg in segments:
             text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
             self.transcript.appendPlainText(text)
@@ -231,18 +240,21 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_search(self) -> None:
         """Search transcript for query text and show results."""
         query = self.search_bar.text()
+        logger.info("Searching for %s", query)
         segments = self.aggregator.get_transcript()
         results = self.keyword_index.search(segments, query)
         self._show_results(results)
 
     def _on_find_editorials(self) -> None:
         """Show segments matching any stored keyword."""
+        logger.info("Finding all editorials")
         segments = self.aggregator.get_transcript()
         results = self.keyword_index.find_all_editorial(segments)
         self._show_results(results)
 
     def _show_results(self, segments: list) -> None:
         """Display search results in the results pane."""
+        logger.debug("Displaying %d search results", len(segments))
         self.results.appendPlainText("---")
         for seg in segments:
             text = f"[{seg.get('speaker', '')}] {seg.get('text', '')}\n"
@@ -250,6 +262,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _refresh_transcript_display(self) -> None:
         """Refresh the transcript pane to reflect stored segments."""
+        logger.debug("Refreshing transcript display")
         if hasattr(self.transcript, "clear"):
             self.transcript.clear()
         else:  # test stub
@@ -260,6 +273,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_rename_speakers(self) -> None:
         """Prompt user to rename each detected speaker."""
+        logger.info("Renaming speakers")
         segments = self.aggregator.get_transcript()
         names = sorted({seg.get("speaker", "") for seg in segments})
         for name in names:
@@ -282,6 +296,7 @@ class MainWindow(QtWidgets.QMainWindow):
         data = exporter(segments)
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(data)
+        logger.info("Transcript exported to %s", path)
 
     def _on_export_txt(self) -> None:
         self._export_transcript(export_txt, "Text Files (*.txt)")
@@ -312,9 +327,12 @@ class MainWindow(QtWidgets.QMainWindow):
             fh.write(text)
         audio_path = path.rsplit(".", 1)[0] + ".wav"
         self.clip_exporter.export_clip(seg.get("file", ""), seg.get("start", 0.0), seg.get("end", 0.0), audio_path)
+        logger.info("Segment exported to %s and %s", path, audio_path)
 
     def _on_settings(self) -> None:
+        logger.info("Opening settings dialog")
         dialog = SettingsDialog(self.settings, self)
         if dialog.exec() == QtWidgets.QDialog.Accepted:
             self.settings.save()
             self.keyword_index = KeywordIndex(self.settings.keyword_path)
+            logger.info("Settings updated")

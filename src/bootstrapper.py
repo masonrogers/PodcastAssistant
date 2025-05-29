@@ -7,18 +7,27 @@ import sys
 import subprocess
 import importlib.util
 import shutil
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def pip_install(package: str) -> int:
-    """Install *package* using pip's internal API."""
-    from pip._internal.cli.main import main as pip_main
-
-    return pip_main(["install", package])
+    """Install *package* using pip via a subprocess."""
+    logger.info("Installing %s", package)
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", package]
+    )
+    if result.returncode != 0:
+        logger.error("Failed to install %s", package)
+    return result.returncode
 
 
 def ensure_pyside6() -> None:
     """Install PySide6 if it's not already available."""
+    logger.debug("Checking for PySide6")
     if importlib.util.find_spec("PySide6") is None:
+        logger.info("PySide6 not found; installing")
         pip_install("PySide6")
 
 
@@ -27,9 +36,12 @@ ensure_pyside6()
 
 def ensure_ffmpeg() -> None:
     """Install FFmpeg and its Python wrapper if they're not available."""
+    logger.debug("Checking for FFmpeg")
     if shutil.which("ffmpeg") is None:
+        logger.info("FFmpeg binary not found; installing ffmpeg-static")
         pip_install("ffmpeg-static")
     if importlib.util.find_spec("ffmpeg") is None:
+        logger.info("ffmpeg-python not found; installing")
         pip_install("ffmpeg-python")
 
 
@@ -51,6 +63,7 @@ class Bootstrapper(QtCore.QThread):
         self.requirements_path = os.path.abspath(requirements_path)
 
     def _read_packages(self) -> list[str]:
+        logger.debug("Reading packages from %s", self.requirements_path)
         with open(self.requirements_path, 'r', encoding='utf-8') as fh:
             return [line.strip() for line in fh if line.strip() and not line.startswith('#')]
 
@@ -59,10 +72,12 @@ class Bootstrapper(QtCore.QThread):
         for pkg in packages:
             name = pkg.split('==')[0]
             if importlib.util.find_spec(name) is None:
+                logger.debug("Package %s missing", name)
                 missing.append(pkg)
         return missing
 
     def run(self) -> None:  # pragma: no cover - integration with PySide6 runtime
+        logger.info("Bootstrapping dependencies")
         pkgs = self._read_packages()
         missing = self._missing_packages(pkgs)
         total = len(missing)

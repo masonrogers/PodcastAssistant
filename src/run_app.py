@@ -1,5 +1,8 @@
+from logger import setup, get_logger
 from bootstrapper import ensure_pyside6
 
+setup()
+logger = get_logger(__name__)
 ensure_pyside6()
 
 from PySide6 import QtWidgets
@@ -8,6 +11,7 @@ from bootstrapper import Bootstrapper
 
 
 def main() -> None:
+    logger.info("Starting Whisper Transcriber")
     app = QtWidgets.QApplication([])
 
     bootstrapper = Bootstrapper()
@@ -23,9 +27,11 @@ def main() -> None:
 
     bootstrapper.start()
     progress.exec()
+    logger.info("Dependencies installed")
 
     window = MainWindow()
     window.show()
+    logger.info("UI initialized")
     app.exec()
 
 
