@@ -21,6 +21,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `uninstall` command modules to avoid `ModuleNotFoundError`.
 - Installer now bundles pip's CA bundle to avoid `FileNotFoundError` when
   pip looks for its certificates at runtime.
+- Installer now bundles `pip._vendor.distlib` to prevent bootstrap errors.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
