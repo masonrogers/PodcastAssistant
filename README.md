@@ -130,10 +130,9 @@ the `logs/` directory if needed and sets up rotating file handlers. The main
 application (`run_app.py`) and the installer builder (`build_installer.py`) call
 this function at startup so logs are available from the very first import.
 
-All components obtain a logger via `get_logger()` and therefore write to their
-own files. The application log is `logs/app.log` and the installer builder uses
-`logs/installer_build.log`. Additional modules create their own files under
-`logs/` as they log activity.
+All modules obtain a logger via `get_logger()` and write to `logs/app.log`. The
+installer builder writes to `logs/installer_build.log`. Log files rotate
+automatically and reside in the `logs/` directory.
 
 The default log level is `INFO`. Edit the `level` values in
 [`src/logging_setup.py`](src/logging_setup.py) to change verbosity.
