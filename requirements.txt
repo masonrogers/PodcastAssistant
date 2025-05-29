@@ -2,4 +2,4 @@ whispercpp
 pyannote.audio
 ffmpeg-python
 PySide6
-ffmpeg-static
+static-ffmpeg
