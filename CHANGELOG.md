@@ -12,6 +12,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - Added `get_logger` usage across modules with informative log messages.
 - `run_app.py` and `build_installer.py` now call `setup_logging()` before other imports so early logging works.
 - Log files are generated per module in `logs/`, such as `app.log` for the main application and `installer_build.log` for the installer builder.
+- Added a `logs/` directory with a `.gitkeep` file so the log folder is tracked in version control.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator

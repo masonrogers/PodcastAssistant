@@ -125,12 +125,17 @@ binary in an NSIS installer.
 
 ## Logging
 
-All logs are stored in the `logs/` directory in the project root. Each major
-component writes to its own file. The main application logs to `app.log` and the
-installer builder logs to `installer_build.log`. Modules that call
-`get_logger()` create additional files under `logs/`.
+Logging is configured by [`setup_logging()`](src/logging_setup.py) which creates
+the `logs/` directory if needed and sets up rotating file handlers. The main
+application (`run_app.py`) and the installer builder (`build_installer.py`) call
+this function at startup so logs are available from the very first import.
 
-The default log level is `INFO`. Edit the `level` fields in
+All components obtain a logger via `get_logger()` and therefore write to their
+own files. The application log is `logs/app.log` and the installer builder uses
+`logs/installer_build.log`. Additional modules create their own files under
+`logs/` as they log activity.
+
+The default log level is `INFO`. Edit the `level` values in
 [`src/logging_setup.py`](src/logging_setup.py) to change verbosity.
 
 ## Contributor Resources
