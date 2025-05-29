@@ -1,7 +1,7 @@
 Whisper Transcriber User Guide
 
 Installation:
-1. Install Python and FFmpeg only if you plan to run from source.
+1. Install Python only if you plan to run from source. FFmpeg is bundled with the application via `static-ffmpeg`.
 2. Run 'python build_installer.py' to create the executable.
 3. Launch the installer from 'dist/'. The installed program includes all dependencies.
 
