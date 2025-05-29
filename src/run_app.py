@@ -21,8 +21,6 @@ def main() -> None:
 
     logger.info("Starting application")
     app = QtWidgets.QApplication([])
-
-    logger.info("Initializing main window")
     window = MainWindow()
     window.show()
     app.exec()
