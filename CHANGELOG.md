@@ -67,6 +67,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `MainWindow` eagerly. Import these objects from their specific modules instead
   of `src`.
 - Removed bootstrapper.
+- Removed `tests/test_bootstrapper.py` now that installation occurs at build
+  time, and updated `tests/test_run_app.py` and `tests/test_uninstaller.py` to
+  reflect the simplified startup and uninstall behavior.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
