@@ -8,7 +8,6 @@ from bootstrapper import ensure_pyside6
 ensure_pyside6()
 
 from PySide6 import QtWidgets
-from main_window import MainWindow
 from bootstrapper import Bootstrapper
 
 
@@ -31,6 +30,7 @@ def main() -> None:
     progress.exec()
 
     logger.info("Initializing main window")
+    from main_window import MainWindow
     window = MainWindow()
     window.show()
     app.exec()

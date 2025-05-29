@@ -31,10 +31,13 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   certificate path, output directory and completion status of the PyInstaller
   run.
 - `build_installer.py` now prepends the repository's `src` directory to `sys.path` so `src.logging_setup` imports reliably.
-- README logging documentation now clarifies that all modules write to
-  `logs/app.log` except `build_installer.py`, which uses
-  `logs/installer_build.log`. It also notes that log files rotate and reside in
-  the `logs/` directory.
+  - README logging documentation now clarifies that all modules write to
+    `logs/app.log` except `build_installer.py`, which uses
+    `logs/installer_build.log`. It also notes that log files rotate and reside in
+    the `logs/` directory.
+ - `run_app.py` now imports `MainWindow` only after the bootstrapper finishes
+   installing packages. This prevents `ModuleNotFoundError` for modules like
+   `whispercpp` when launching the packaged executable.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,
