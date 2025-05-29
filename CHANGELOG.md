@@ -21,7 +21,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   locate its certificates at runtime.
 - Removed `--hidden-import` options for pip's internal commands and
   `pip._vendor.distlib` from the build script.
-- `ensure_pyside6()` and `ensure_ffmpeg()` no longer run on module import. `run_app` now calls them explicitly to avoid repeated pip processes.
+
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
