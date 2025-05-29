@@ -9,12 +9,17 @@ import importlib.util
 import shutil
 
 
+def pip_install(package: str) -> int:
+    """Install *package* using pip's internal API."""
+    from pip._internal.cli.main import main as pip_main
+
+    return pip_main(["install", package])
+
+
 def ensure_pyside6() -> None:
     """Install PySide6 if it's not already available."""
     if importlib.util.find_spec("PySide6") is None:
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "PySide6"], check=False
-        )
+        pip_install("PySide6")
 
 
 ensure_pyside6()
@@ -23,13 +28,9 @@ ensure_pyside6()
 def ensure_ffmpeg() -> None:
     """Install FFmpeg and its Python wrapper if they're not available."""
     if shutil.which("ffmpeg") is None:
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "ffmpeg-static"], check=False
-        )
+        pip_install("ffmpeg-static")
     if importlib.util.find_spec("ffmpeg") is None:
-        subprocess.run(
-            [sys.executable, "-m", "pip", "install", "ffmpeg-python"], check=False
-        )
+        pip_install("ffmpeg-python")
 
 
 ensure_ffmpeg()
@@ -66,7 +67,7 @@ class Bootstrapper(QtCore.QThread):
         missing = self._missing_packages(pkgs)
         total = len(missing)
         for i, pkg in enumerate(missing):
-            subprocess.run([sys.executable, '-m', 'pip', 'install', pkg], check=False)
+            pip_install(pkg)
             if total:
                 self.progress.emit((i + 1) / total)
         self.finished.emit()
