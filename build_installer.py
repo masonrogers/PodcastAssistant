@@ -1,11 +1,17 @@
 """Builds a standalone Whisper Transcriber executable using PyInstaller."""
 
+from src.logging_setup import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger("build_installer")
+
 import os
 import PyInstaller.__main__
 import pip._vendor.certifi
 
 
 def main() -> None:
+    logger.info("Building installer")
     cert_path = pip._vendor.certifi.where()
     PyInstaller.__main__.run(
         [

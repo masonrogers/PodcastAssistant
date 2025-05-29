@@ -1,3 +1,8 @@
+from logging_setup import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
+
 from bootstrapper import ensure_pyside6
 
 ensure_pyside6()
@@ -8,6 +13,7 @@ from bootstrapper import Bootstrapper
 
 
 def main() -> None:
+    logger.info("Starting application")
     app = QtWidgets.QApplication([])
 
     bootstrapper = Bootstrapper()
@@ -24,6 +30,7 @@ def main() -> None:
     bootstrapper.start()
     progress.exec()
 
+    logger.info("Initializing main window")
     window = MainWindow()
     window.show()
     app.exec()

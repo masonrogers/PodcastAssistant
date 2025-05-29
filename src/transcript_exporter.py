@@ -4,16 +4,21 @@ from __future__ import annotations
 
 import json
 from typing import List, Dict
+from logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 
 def export_txt(segments: List[Dict]) -> str:
     """Return the transcript as plain text with each segment on a new line."""
+    logger.info("Exporting %d segments as TXT", len(segments))
     lines = [seg.get("text", "") for seg in segments]
     return "\n".join(lines)
 
 
 def export_json(segments: List[Dict]) -> str:
     """Return the transcript segments serialized as formatted JSON."""
+    logger.info("Exporting %d segments as JSON", len(segments))
     return json.dumps(segments, indent=2, ensure_ascii=False)
 
 
@@ -28,6 +33,7 @@ def _format_timestamp(seconds: float) -> str:
 
 def export_srt(segments: List[Dict]) -> str:
     """Return the transcript in SubRip (SRT) subtitle format."""
+    logger.info("Exporting %d segments as SRT", len(segments))
     lines: List[str] = []
     for idx, seg in enumerate(segments, 1):
         start = _format_timestamp(float(seg.get("start", 0.0)))
