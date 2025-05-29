@@ -22,6 +22,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - Removed `--hidden-import` options for pip's internal commands and
   `pip._vendor.distlib` from the build script.
 
+
 ## [0.1.0] – YYYY-MM-DD
 ### Added
 - Initial changelog with sections for future releases.

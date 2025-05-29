@@ -118,6 +118,8 @@ def test_ensure_pyside6_installs_when_missing_and_skips_when_present(monkeypatch
     sys.modules.pop('bootstrapper', None)
     bs_module = importlib.import_module('bootstrapper')
 
+    assert runs == []
+    bs_module.ensure_pyside6()
     assert runs == ['PySide6']
 
     # PySide6 present -> no installation attempt
@@ -153,6 +155,8 @@ def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch)
     sys.modules.pop('bootstrapper', None)
     bs_module = importlib.import_module('bootstrapper')
 
+    assert runs == []
+    bs_module.ensure_ffmpeg()
     assert runs == [
         'ffmpeg-static',
         'ffmpeg-python',

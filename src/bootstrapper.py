@@ -23,18 +23,12 @@ def ensure_pyside6() -> None:
         pip_install("PySide6")
 
 
-ensure_pyside6()
-
-
 def ensure_ffmpeg() -> None:
     """Install FFmpeg and its Python wrapper if they're not available."""
     if shutil.which("ffmpeg") is None:
         pip_install("ffmpeg-static")
     if importlib.util.find_spec("ffmpeg") is None:
         pip_install("ffmpeg-python")
-
-
-ensure_ffmpeg()
 
 from PySide6 import QtCore
 
