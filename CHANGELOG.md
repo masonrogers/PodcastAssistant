@@ -16,6 +16,10 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `.gitignore` now excludes log files under `logs/*.log`.
 - `build_installer.py` now packages `requirements.txt` with the executable using
   PyInstaller's `--add-data` option so the installer includes the dependency list.
+- `build_installer.py` now bundles `src/uninstaller.py` with the executable so
+  the uninstaller can run from the packaged application.
+- `run_app.py` exits early when invoked with `uninstaller.py` and calls
+  `uninstall_packages()` using the bundled `requirements.txt` path.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator

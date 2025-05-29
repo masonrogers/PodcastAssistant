@@ -1,4 +1,6 @@
 from logging_setup import setup_logging, get_logger
+import os
+import sys
 
 setup_logging()
 logger = get_logger(__name__)
@@ -12,6 +14,15 @@ from bootstrapper import Bootstrapper
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1].endswith("uninstaller.py"):
+        if getattr(sys, "frozen", False):
+            req_path = os.path.join(os.path.dirname(sys.executable), "requirements.txt")
+        else:
+            req_path = os.path.join(os.path.dirname(__file__), "..", "requirements.txt")
+        import uninstaller
+        uninstaller.uninstall_packages(req_path)
+        return
+
     logger.info("Starting application")
     app = QtWidgets.QApplication([])
 
