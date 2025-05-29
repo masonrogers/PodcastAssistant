@@ -127,7 +127,9 @@ binary in an NSIS installer.
 
 Application logs are written to the `logs/` directory at the repository root.
 `app.log` stores general runtime messages and `installer_build.log` captures
-output from `build_installer.py`.
+output from `build_installer.py`. The installer log includes the resolved
+certificate path, the output directory and messages marking the start and
+completion of the build.
 
 ## Contributor Resources
 
