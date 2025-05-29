@@ -36,6 +36,12 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `logs/installer_build.log`. It also notes that log files rotate and reside in
   the `logs/` directory.
 
+### Removed
+- **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,
+  `KeywordIndex`, `ClipExporter`, `transcript_exporter`, `Settings`, or
+  `MainWindow` eagerly. Import these objects from their specific modules instead
+  of `src`.
+
 ## [0.1.0] – YYYY-MM-DD
 ### Added
 - Initial changelog with sections for future releases.
