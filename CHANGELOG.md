@@ -53,6 +53,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `build_installer.py` now passes `--collect-all=whispercpp` and
   `--hidden-import=whispercpp` to PyInstaller so the packaged executable
   includes WhisperCPP resources.
+- `build_installer.py` now passes `--collect-binaries=whispercpp` so the
+  transcription engine's binary library is bundled.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,
