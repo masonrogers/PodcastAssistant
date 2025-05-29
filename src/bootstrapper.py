@@ -7,19 +7,25 @@ import sys
 import subprocess
 import importlib.util
 import shutil
+from logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 
 def pip_install(package: str) -> int:
     """Install *package* using pip via a subprocess."""
+    logger.info("Installing package %s", package)
     result = subprocess.run(
         [sys.executable, "-m", "pip", "install", package]
     )
+    logger.debug("pip install return code: %s", result.returncode)
     return result.returncode
 
 
 def ensure_pyside6() -> None:
     """Install PySide6 if it's not already available."""
     if importlib.util.find_spec("PySide6") is None:
+        logger.info("PySide6 missing, installing...")
         pip_install("PySide6")
 
 
@@ -29,8 +35,10 @@ ensure_pyside6()
 def ensure_ffmpeg() -> None:
     """Install FFmpeg and its Python wrapper if they're not available."""
     if shutil.which("ffmpeg") is None:
+        logger.info("FFmpeg executable missing, installing ffmpeg-static...")
         pip_install("ffmpeg-static")
     if importlib.util.find_spec("ffmpeg") is None:
+        logger.info("ffmpeg Python module missing, installing ffmpeg-python...")
         pip_install("ffmpeg-python")
 
 
@@ -52,6 +60,7 @@ class Bootstrapper(QtCore.QThread):
         self.requirements_path = os.path.abspath(requirements_path)
 
     def _read_packages(self) -> list[str]:
+        logger.debug("Reading requirements from %s", self.requirements_path)
         with open(self.requirements_path, 'r', encoding='utf-8') as fh:
             return [line.strip() for line in fh if line.strip() and not line.startswith('#')]
 
@@ -64,6 +73,7 @@ class Bootstrapper(QtCore.QThread):
         return missing
 
     def run(self) -> None:  # pragma: no cover - integration with PySide6 runtime
+        logger.info("Checking for missing packages")
         pkgs = self._read_packages()
         missing = self._missing_packages(pkgs)
         total = len(missing)

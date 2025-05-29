@@ -3,6 +3,9 @@ from __future__ import annotations
 """PySide6 GUI for the Podcast Assistant."""
 
 from PySide6 import QtWidgets, QtCore
+from logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 from transcript_exporter import export_txt, export_json, export_srt
 from clip_exporter import ClipExporter
@@ -162,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_file(self, path: str) -> None:
         """Add an audio file entry with a progress bar."""
+        logger.info("Adding file %s", path)
         item = QtWidgets.QListWidgetItem(path)
         widget = QtWidgets.QWidget()
         h = QtWidgets.QHBoxLayout(widget)
@@ -179,6 +183,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Begin processing files in the current list order."""
         if self.processing:
             return
+        logger.info("Starting processing of file list")
         self.processing = True
         self.current_index = 0
         self._process_next()
@@ -189,6 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         item = self.file_list.item(self.current_index)
         path, progress = item.data(QtCore.Qt.UserRole)
+        logger.debug("Processing file %s", path)
         t_thread = TranscriberThread(path, parent=self)
         self.threads.append(t_thread)
         t_thread.progress.connect(lambda p: progress.setValue(int(p * 50)))
@@ -209,6 +215,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_diarized(self, path: str, segments: list, progress: QtWidgets.QProgressBar) -> None:
         """Handle diarization completion for a file."""
+        logger.info("Diarization finished for %s", path)
         self.aggregator.add_segments(path, segments)
         self.display_segments(segments)
         progress.setValue(100)
@@ -218,6 +225,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # Placeholder hooks for workers
     def start_transcription(self, path: str) -> None:
         """Start transcribing a file."""
+        logger.info("Starting single transcription for %s", path)
         thread = TranscriberThread(path, parent=self)
         thread.finished.connect(lambda segs: self.display_segments(segs))
         thread.start()
@@ -231,12 +239,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_search(self) -> None:
         """Search transcript for query text and show results."""
         query = self.search_bar.text()
+        logger.info("Searching transcript for '%s'", query)
         segments = self.aggregator.get_transcript()
         results = self.keyword_index.search(segments, query)
         self._show_results(results)
 
     def _on_find_editorials(self) -> None:
         """Show segments matching any stored keyword."""
+        logger.info("Finding editorial segments")
         segments = self.aggregator.get_transcript()
         results = self.keyword_index.find_all_editorial(segments)
         self._show_results(results)
@@ -278,6 +288,7 @@ class MainWindow(QtWidgets.QMainWindow):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Transcript", "", filter_mask)
         if not path:
             return
+        logger.info("Exporting transcript to %s", path)
         segments = self.aggregator.get_transcript()
         data = exporter(segments)
         with open(path, "w", encoding="utf-8") as fh:
@@ -307,6 +318,7 @@ class MainWindow(QtWidgets.QMainWindow):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Segment", "", "Text Files (*.txt)")
         if not path:
             return
+        logger.info("Exporting selected segment to %s", path)
         text = export_txt([seg])
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(text)
@@ -316,5 +328,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_settings(self) -> None:
         dialog = SettingsDialog(self.settings, self)
         if dialog.exec() == QtWidgets.QDialog.Accepted:
+            logger.info("Saving settings")
             self.settings.save()
             self.keyword_index = KeywordIndex(self.settings.keyword_path)

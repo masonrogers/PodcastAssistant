@@ -9,6 +9,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `ensure_ffmpeg()` installs `ffmpeg-python` automatically when the Python wrapper is missing.
 - `pip_install()` and `pip_uninstall()` helper functions manage package installation and removal.
 - `setup_logging()` in `src/logging_setup.py` configures rotating file logs under `logs/` and provides `get_logger()`.
+- Added `get_logger` usage across modules with informative log messages.
+- `run_app.py` and `build_installer.py` now call `setup_logging()` before other imports so early logging works.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator

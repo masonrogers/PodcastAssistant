@@ -1,14 +1,19 @@
 from whispercpp import Whisper
+from logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 class TranscribeWorker:
     """Loads a Whisper model and transcribes audio files."""
 
     def __init__(self, model_path: str = "large"):
         self.model_path = model_path
+        logger.info("Loading Whisper model: %s", model_path)
         self.model = Whisper(model_path)
 
     def transcribe(self, audio_path: str):
         """Transcribe the given audio file and return segments."""
+        logger.info("Transcribing %s", audio_path)
         # request timestamps from the Whisper model
         result = self.model.transcribe(audio_path)
         segments = []

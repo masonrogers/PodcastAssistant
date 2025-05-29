@@ -1,4 +1,7 @@
 from typing import List, Dict
+from logging_setup import get_logger
+
+logger = get_logger(__name__)
 
 class TranscriptAggregator:
     """Collects transcript segments from multiple audio files."""
@@ -11,6 +14,7 @@ class TranscriptAggregator:
 
         Each segment will be copied and annotated with the source filename.
         """
+        logger.info("Adding %d segments from %s", len(segments), audio_file)
         for seg in segments:
             entry = seg.copy()
             entry["file"] = audio_file
@@ -22,6 +26,7 @@ class TranscriptAggregator:
 
     def rename_speaker(self, old_name: str, new_name: str) -> None:
         """Rename a speaker in all stored segments."""
+        logger.info("Renaming speaker %s to %s", old_name, new_name)
         for seg in self._segments:
             if seg.get("speaker") == old_name:
                 seg["speaker"] = new_name
