@@ -5,19 +5,16 @@ import importlib
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 
-def test_uninstall_packages_invokes_pip(monkeypatch, tmp_path):
-    req = tmp_path / 'req.txt'
-    req.write_text('pkgA\npkgB==1.2\n# comment\n\npkgC\n')
-
-    runs = []
-
-    def fake_uninstall(pkg):
-        runs.append(pkg)
+def test_remove_app_files_deletes_contents(tmp_path):
+    app_dir = tmp_path / 'app'
+    app_dir.mkdir()
+    (app_dir / 'file.txt').write_text('data')
+    sub = app_dir / 'subdir'
+    sub.mkdir()
+    (sub / 'nested.txt').write_text('data')
 
     mod = importlib.import_module('uninstaller')
-    mod = importlib.reload(mod)
-    monkeypatch.setattr(mod, 'pip_uninstall', fake_uninstall)
-    mod.uninstall_packages(str(req))
+    mod.remove_app_files(str(app_dir))
 
-    expected = ['pkgA', 'pkgB==1.2', 'pkgC']
-    assert runs == expected
+    assert list(app_dir.iterdir()) == []
+

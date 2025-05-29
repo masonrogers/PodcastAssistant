@@ -2,11 +2,7 @@
 
 ## 1 — Core Functionality
 
-- On startup, the bootstrapper first ensures PySide6 and FFmpeg are installed so the Qt
-  progress window can launch. This includes installing `ffmpeg-static` for the
-  executable and `ffmpeg-python` for the wrapper if they are missing. The window
-  then installs any remaining dependencies with a progress bar before starting
-  the main application.
+- Install Python and the packages in `requirements.txt` before running the application.
 - Accept multiple audio files (browse or drag-drop). The file list supports
   drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
@@ -16,9 +12,7 @@
   - Full transcript → TXT, JSON, SRT
 - Highlighted segment → same text formats plus clipped audio (FFmpeg).
 - Entirely offline / internal use; no data leaves the machine.
-- Uninstallation cleans up any dependencies installed by the bootstrapper. Run
-  `WhisperTranscriber.exe uninstaller.py` (or `python src/uninstaller.py` when
-  running from source) to remove them.
+- Uninstallation deletes the application files. Run `WhisperTranscriber.exe uninstaller.py` (or `python src/uninstaller.py` when running from source) to remove them.
 
 ## 2 — Technology Stack
 
@@ -43,9 +37,8 @@
 | `ClipExporter`        | Cuts audio for highlighted range via FFmpeg            |
 | `TranscriptExporter`  | Exports transcript segments to TXT, JSON, and SRT |
 | `Settings`            | Persists UI prefs & keyword path                       |
-| `Bootstrapper`        | Installs PySide6 if needed and then shows a progress dialog while installing the rest |
 | `Installer`           | NSIS script for final .exe                             |
-| `uninstaller.py`      | Removes packages during uninstall |
+| `uninstaller.py`      | Deletes installed application files
 The `ClipExporter` in `src/clip_exporter.py` wraps ffmpeg-python and provides
 `export_clip(audio_path, start, end, dest_path)` for saving short audio clips.
 
@@ -124,7 +117,7 @@ python build_installer.py
 
 The build process bundles pip's CA certificates so that pip can install
 missing packages at runtime. It also packages ``requirements.txt`` next to the
-executable so the bootstrapper can read it when frozen.
+executable so the application can read it when frozen.
 It further collects all ``whispercpp`` resources so the embedded
 transcription engine works out of the box. The script additionally passes
 ``--collect-binaries=whispercpp`` so the compiled library for the
@@ -133,9 +126,6 @@ adds ``hook-whispercpp.py`` which collects dynamic libraries for
 ``whispercpp``. The build script passes
 ``--additional-hooks-dir=pyinstaller_hooks`` so PyInstaller can load this hook.
 
-When running the bundled executable, the bootstrapper checks ``sys.frozen`` and
-loads this bundled ``requirements.txt`` from the executable's directory. When
-running from source, it falls back to the repository's ``requirements.txt``.
 
 The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this

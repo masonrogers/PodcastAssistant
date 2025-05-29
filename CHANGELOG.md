@@ -67,6 +67,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `KeywordIndex`, `ClipExporter`, `transcript_exporter`, `Settings`, or
   `MainWindow` eagerly. Import these objects from their specific modules instead
   of `src`.
+- Removed bootstrapper.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
