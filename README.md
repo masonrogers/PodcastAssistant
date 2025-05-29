@@ -119,6 +119,8 @@ python build_installer.py
 The build process bundles pip's CA certificates so that pip can install
 missing packages at runtime. It also packages ``requirements.txt`` next to the
 executable so the bootstrapper can read it when frozen.
+It further collects all ``whispercpp`` resources so the embedded
+transcription engine works out of the box.
 
 When running the bundled executable, the bootstrapper checks ``sys.frozen`` and
 loads this bundled ``requirements.txt`` from the executable's directory. When
