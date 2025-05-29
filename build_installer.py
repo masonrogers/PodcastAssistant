@@ -33,6 +33,7 @@ def main() -> None:
             "--noconfirm",
             "--hidden-import=pip._vendor.certifi",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
+            f"--add-data=requirements.txt{os.pathsep}.",
             "--distpath",
             out_dir,
         ]

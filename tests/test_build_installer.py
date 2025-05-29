@@ -59,6 +59,7 @@ def test_build_installer_logs_created(monkeypatch):
     build_installer.main()
 
     assert run_args, 'PyInstaller.run was not called'
+    assert f"--add-data=requirements.txt{os.pathsep}." in run_args[0]
     assert log_file.exists()
     assert 'Starting PyInstaller build' in log_file.read_text()
 
