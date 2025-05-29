@@ -19,6 +19,7 @@ def main() -> None:
             "--hidden-import=pip._internal.commands.install",
             "--hidden-import=pip._internal.commands.uninstall",
             "--hidden-import=pip._vendor.certifi",
+            "--hidden-import=pip._vendor.distlib",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
             "--distpath",
             "dist",
