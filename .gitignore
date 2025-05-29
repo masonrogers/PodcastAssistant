@@ -6,3 +6,4 @@ build/
 .mypy_cache/
 out.json
 logs/*.log
+*.spec

@@ -20,6 +20,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   the uninstaller can run from the packaged application.
 - `run_app.py` exits early when invoked with `uninstaller.py` and calls
   `uninstall_packages()` using the bundled `requirements.txt` path.
+- `.gitignore` now excludes PyInstaller-generated `*.spec` files.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
