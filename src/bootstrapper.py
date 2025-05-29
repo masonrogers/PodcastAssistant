@@ -12,14 +12,21 @@ from logging_setup import get_logger
 logger = get_logger(__name__)
 
 
-def pip_install(package: str) -> int:
-    """Install *package* using pip via a subprocess."""
+def pip_install(package: str) -> None:
+    """Install *package* using pip via a subprocess.
+
+    Raises
+    ------
+    RuntimeError
+        If the pip process exits with a non-zero status code.
+    """
     logger.info("Installing package %s", package)
     result = subprocess.run(
         [sys.executable, "-m", "pip", "install", package]
     )
     logger.debug("pip install return code: %s", result.returncode)
-    return result.returncode
+    if result.returncode != 0:
+        raise RuntimeError(f"pip install failed for {package}")
 
 
 def ensure_pyside6() -> None:
@@ -90,7 +97,22 @@ class Bootstrapper(QtCore.QThread):
         missing = self._missing_packages(pkgs)
         total = len(missing)
         for i, pkg in enumerate(missing):
-            pip_install(pkg)
-            if total:
-                self.progress.emit((i + 1) / total)
+            try:
+                pip_install(pkg)
+            except Exception as exc:  # pragma: no cover - error path
+                logger.error("Failed to install %s: %s", pkg, exc)
+                try:
+                    from PySide6 import QtWidgets  # type: ignore
+                except Exception:
+                    QtWidgets = None
+                if QtWidgets is not None:
+                    QtWidgets.QMessageBox.critical(
+                        None,
+                        "Installation Error",
+                        f"Failed to install {pkg}. See logs for details.",
+                    )
+                break
+            else:
+                if total:
+                    self.progress.emit((i + 1) / total)
         self.finished.emit()
