@@ -78,7 +78,9 @@ class Bootstrapper(QtCore.QThread):
         missing = []
         for pkg in packages:
             name = pkg.split('==')[0]
-            if importlib.util.find_spec(name) is None:
+            try:
+                importlib.import_module(name)
+            except ImportError:
                 missing.append(pkg)
         return missing
 

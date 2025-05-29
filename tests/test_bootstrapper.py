@@ -36,11 +36,13 @@ def make_pyside6_stub():
                 self.run()
 
     qtcore = types.ModuleType('PySide6.QtCore')
+    qtcore.__spec__ = importlib.machinery.ModuleSpec('PySide6.QtCore', loader=None)
     qtcore.QThread = QThread
     qtcore.QObject = StubObject
     qtcore.Signal = Signal
 
     pyside6 = types.ModuleType('PySide6')
+    pyside6.__spec__ = importlib.machinery.ModuleSpec('PySide6', loader=None)
     pyside6.QtCore = qtcore
 
     return {'PySide6': pyside6, 'PySide6.QtCore': qtcore}
@@ -53,10 +55,15 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
 
     missing = {'pkgA': True, 'pkgB': False, 'pkgC': True}
 
-    def fake_find_spec(name):
+    real_import_module = importlib.import_module
+
+    def fake_import_module(name, package=None):
         if missing.get(name):
-            return None
-        return object()
+            raise ImportError(name)
+        try:
+            return real_import_module(name, package)
+        except ImportError:
+            return types.ModuleType(name)
 
     runs = []
 
@@ -67,7 +74,8 @@ def test_bootstrapper_installs_missing(monkeypatch, tmp_path):
         runs.append(cmd[-1])
         return Result()
 
-    monkeypatch.setattr(importlib.util, 'find_spec', fake_find_spec)
+    monkeypatch.setattr(importlib, 'import_module', fake_import_module)
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
     monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
     monkeypatch.setattr(subprocess, 'run', fake_run)
 
