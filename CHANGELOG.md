@@ -7,7 +7,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ### Added
 - `ensure_ffmpeg()` installs `ffmpeg-static` automatically when FFmpeg is not present.
 - `ensure_ffmpeg()` installs `ffmpeg-python` automatically when the Python wrapper is missing.
-- `pip_install()` and `pip_uninstall()` helper functions manage package installation and removal without spawning subprocesses.
+- `pip_install()` and `pip_uninstall()` helper functions manage package installation and removal.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
@@ -15,13 +15,12 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
    removed from the repository.
  - `build_installer.py` now passes `--paths src` to `PyInstaller.__main__.run`
    so bundled executables can import the `bootstrapper` module without errors.
-- `bootstrapper` and `uninstaller` now use the new helper functions instead
-  of invoking `subprocess.run` with `sys.executable -m pip`.
-- Bundled PyInstaller executable now includes pip's internal `install` and
-  `uninstall` command modules to avoid `ModuleNotFoundError`.
-- Installer now bundles pip's CA bundle to avoid `FileNotFoundError` when
-  pip looks for its certificates at runtime.
-- Installer now bundles `pip._vendor.distlib` to prevent bootstrap errors.
+- `bootstrapper` and `uninstaller` now invoke pip via subprocess for better
+  compatibility with the packaged application.
+- Bundled PyInstaller executable now includes pip's CA bundle so pip can
+  locate its certificates at runtime.
+- Removed `--hidden-import` options for pip's internal commands and
+  `pip._vendor.distlib` from the build script.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added

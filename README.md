@@ -116,8 +116,8 @@ Run the helper script which invokes PyInstaller:
 python build_installer.py
 ```
 
-The script adds `--hidden-import=pip._vendor.distlib` so pip can bootstrap
-correctly. Include the same option if invoking PyInstaller manually.
+The build process bundles pip's CA certificates so that pip can install
+missing packages at runtime.
 
 The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
