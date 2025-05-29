@@ -2,7 +2,7 @@
 
 ## 1 — Core Functionality
 
- - The packaged executable embeds Python and all required libraries. Install Python and the packages in `requirements.txt` only when running from source.
+- The packaged executable embeds Python, a static FFmpeg binary via `static-ffmpeg`, and all required libraries. Install Python and the packages in `requirements.txt` only when running from source.
 - Accept multiple audio files (browse or drag-drop). The file list supports
   drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).

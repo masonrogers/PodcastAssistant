@@ -5,7 +5,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 
 ## [Unreleased]
 ### Added
-- `ensure_ffmpeg()` installs `ffmpeg-static` automatically when FFmpeg is not present.
+- `ensure_ffmpeg()` installs `static-ffmpeg` automatically when FFmpeg is not present, bundling a static binary for packaging.
 - `ensure_ffmpeg()` installs `ffmpeg-python` automatically when the Python wrapper is missing.
 - `pip_install()` and `pip_uninstall()` helper functions manage package installation and removal.
 - `setup_logging()` in `src/logging_setup.py` configures rotating file logs under `logs/` and provides `get_logger()`.
