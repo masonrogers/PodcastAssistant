@@ -60,6 +60,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `src/uninstaller.py` into the PyInstaller bundle.
 - `run_app.py` launches `MainWindow` directly. Startup no longer displays a
   progress dialog or reads `requirements.txt`.
+- Updated README and user guide to remove bootstrapper instructions.
+  The bootstrapping section now explains that the packaged executable
+  contains all dependencies and uninstallation uses Add/Remove Programs.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,

@@ -2,9 +2,9 @@ CONTENT_LINES = [
     "Whisper Transcriber User Guide",
     "",
     "Installation:",
-    "1. Install Python and FFmpeg.",
+    "1. Install Python and FFmpeg only if you plan to run from source.",
     "2. Run 'python build_installer.py' to create the executable.",
-    "3. Launch the installer from 'dist/'.",
+    "3. Launch the installer from 'dist/'. The installed program includes all dependencies.",
     "",
     "Basic Usage:",
     "1. Drag audio files into the file list in order.",
@@ -18,7 +18,7 @@ CONTENT_LINES = [
     "Edit 'keywords.json' via the Settings dialog to update search terms.",
     "",
     "Uninstallation:",
-    "Run 'python src/uninstaller.py' to delete installed files.",
+    "Use Add/Remove Programs to remove Whisper Transcriber.",
 ]
 
 

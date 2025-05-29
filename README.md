@@ -2,7 +2,7 @@
 
 ## 1 — Core Functionality
 
-- Install Python and the packages in `requirements.txt` before running the application.
+ - The packaged executable embeds Python and all required libraries. Install Python and the packages in `requirements.txt` only when running from source.
 - Accept multiple audio files (browse or drag-drop). The file list supports
   drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
@@ -12,7 +12,7 @@
   - Full transcript → TXT, JSON, SRT
 - Highlighted segment → same text formats plus clipped audio (FFmpeg).
 - Entirely offline / internal use; no data leaves the machine.
-- Uninstallation deletes the application files. Run `WhisperTranscriber.exe uninstaller.py` (or `python src/uninstaller.py` when running from source) to remove them.
+ - Uninstallation is handled by the installer. Use the standard Add/Remove Programs entry to remove the application.
 
 ## 2 — Technology Stack
 
@@ -115,14 +115,13 @@ That’s the entire plan—feature set, tech choices, modules, and deliverables�
 
 ### Invocation
 
-Run the helper script which invokes PyInstaller:
+Run the helper script which invokes PyInstaller. Ensure all Python packages are installed first:
 
 ```bash
 python build_installer.py
 ```
 
-All dependencies must be installed prior to running the build script. PyInstaller
-copies these packages into the executable so everything is available at runtime.
+PyInstaller bundles Python and every package listed in `requirements.txt` into the executable so the program works without installing anything on the target machine.
 The process also bundles pip's CA certificates and collects all ``whispercpp``
 resources so the embedded transcription engine works out of the box. The script additionally passes
 ``--collect-binaries=whispercpp`` so the compiled library for the
