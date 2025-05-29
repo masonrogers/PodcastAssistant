@@ -11,6 +11,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `setup_logging()` in `src/logging_setup.py` configures rotating file logs under `logs/` and provides `get_logger()`.
 - Added `get_logger` usage across modules with informative log messages.
 - `run_app.py` and `build_installer.py` now call `setup_logging()` before other imports so early logging works.
+- Log files are generated per module in `logs/`, such as `app.log` for the main application and `installer_build.log` for the installer builder.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
