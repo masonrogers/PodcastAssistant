@@ -15,8 +15,10 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
    removed from the repository.
  - `build_installer.py` now passes `--paths src` to `PyInstaller.__main__.run`
    so bundled executables can import the `bootstrapper` module without errors.
- - `bootstrapper` and `uninstaller` now use the new helper functions instead
-   of invoking `subprocess.run` with `sys.executable -m pip`.
+- `bootstrapper` and `uninstaller` now use the new helper functions instead
+  of invoking `subprocess.run` with `sys.executable -m pip`.
+- Bundled PyInstaller executable now includes pip's internal `install` and
+  `uninstall` command modules to avoid `ModuleNotFoundError`.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added

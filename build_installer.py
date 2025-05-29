@@ -13,6 +13,8 @@ def main() -> None:
             "--onefile",
             "--windowed",
             "--noconfirm",
+            "--hidden-import=pip._internal.commands.install",
+            "--hidden-import=pip._internal.commands.uninstall",
             "--distpath",
             "dist",
         ]
