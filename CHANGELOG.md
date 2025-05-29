@@ -58,6 +58,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - Dependencies are now installed before building and bundled inside the
   executable. `build_installer.py` no longer copies `requirements.txt` or
   `src/uninstaller.py` into the PyInstaller bundle.
+- `run_app.py` launches `MainWindow` directly. Startup no longer displays a
+  progress dialog or reads `requirements.txt`.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,
