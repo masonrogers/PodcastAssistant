@@ -11,19 +11,13 @@ def test_uninstall_packages_invokes_pip(monkeypatch, tmp_path):
 
     runs = []
 
-    def fake_run(args, check=False):
-        runs.append(args)
-
-    import subprocess
-    monkeypatch.setattr(subprocess, 'run', fake_run)
+    def fake_uninstall(pkg):
+        runs.append(pkg)
 
     mod = importlib.import_module('uninstaller')
     mod = importlib.reload(mod)
+    monkeypatch.setattr(mod, 'pip_uninstall', fake_uninstall)
     mod.uninstall_packages(str(req))
 
-    expected = [
-        [sys.executable, '-m', 'pip', 'uninstall', '-y', 'pkgA'],
-        [sys.executable, '-m', 'pip', 'uninstall', '-y', 'pkgB==1.2'],
-        [sys.executable, '-m', 'pip', 'uninstall', '-y', 'pkgC'],
-    ]
+    expected = ['pkgA', 'pkgB==1.2', 'pkgC']
     assert runs == expected

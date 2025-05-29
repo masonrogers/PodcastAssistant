@@ -7,6 +7,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 ### Added
 - `ensure_ffmpeg()` installs `ffmpeg-static` automatically when FFmpeg is not present.
 - `ensure_ffmpeg()` installs `ffmpeg-python` automatically when the Python wrapper is missing.
+- `pip_install()` and `pip_uninstall()` helper functions manage package installation and removal without spawning subprocesses.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
@@ -14,6 +15,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
    removed from the repository.
  - `build_installer.py` now passes `--paths src` to `PyInstaller.__main__.run`
    so bundled executables can import the `bootstrapper` module without errors.
+ - `bootstrapper` and `uninstaller` now use the new helper functions instead
+   of invoking `subprocess.run` with `sys.executable -m pip`.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added

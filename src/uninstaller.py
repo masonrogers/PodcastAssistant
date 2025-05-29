@@ -7,13 +7,20 @@ import sys
 import subprocess
 
 
+def pip_uninstall(package: str) -> int:
+    """Uninstall *package* using pip's internal API."""
+    from pip._internal.cli.main import main as pip_main
+
+    return pip_main(["uninstall", "-y", package])
+
+
 def uninstall_packages(requirements_path: str) -> None:
     """Read ``requirements_path`` and uninstall each package listed."""
     with open(requirements_path, 'r', encoding='utf-8') as fh:
         packages = [line.strip() for line in fh if line.strip() and not line.startswith('#')]
 
     for pkg in packages:
-        subprocess.run([sys.executable, '-m', 'pip', 'uninstall', '-y', pkg], check=False)
+        pip_uninstall(pkg)
 
 
 if __name__ == '__main__':  # pragma: no cover - used by installer
