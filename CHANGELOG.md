@@ -19,6 +19,8 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   of invoking `subprocess.run` with `sys.executable -m pip`.
 - Bundled PyInstaller executable now includes pip's internal `install` and
   `uninstall` command modules to avoid `ModuleNotFoundError`.
+- Installer now bundles pip's CA bundle to avoid `FileNotFoundError` when
+  pip looks for its certificates at runtime.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
