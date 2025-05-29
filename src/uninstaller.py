@@ -11,6 +11,25 @@ def pip_uninstall(package: str) -> int:
     """Uninstall *package* using pip's internal API."""
     from pip._internal.cli.main import main as pip_main
 
+    try:  # register PyInstaller's loader so distlib works in a frozen app
+        import pip._vendor.distlib.resources as dist_resources
+        import importlib.machinery
+
+        dist_resources._finder_registry[importlib.machinery.FrozenImporter] = (
+            dist_resources.ResourceFinder
+        )
+
+        try:
+            from PyInstaller.loader import pyimod02_importers
+
+            dist_resources._finder_registry[
+                pyimod02_importers.FrozenImporter
+            ] = dist_resources.ResourceFinder
+        except Exception:
+            pass
+    except Exception:  # pragma: no cover - defensive
+        pass
+
     return pip_main(["uninstall", "-y", package])
 
 
