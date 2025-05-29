@@ -55,11 +55,13 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   includes WhisperCPP resources.
 - `build_installer.py` now passes `--collect-binaries=whispercpp` so the
   transcription engine's binary library is bundled.
-- Dependencies are now installed before building and bundled inside the
-  executable. `build_installer.py` no longer copies `requirements.txt` or
-  `src/uninstaller.py` into the PyInstaller bundle.
+- Dependencies are bundled within the executable during the build process.
+  `build_installer.py` no longer copies `requirements.txt` or `src/uninstaller.py`
+  into the PyInstaller bundle.
 - `run_app.py` launches `MainWindow` directly. Startup no longer displays a
   progress dialog or reads `requirements.txt`.
+- Uninstaller now removes only application files and is launched via Add/Remove
+  Programs.
 - Updated README and user guide to remove bootstrapper instructions.
   The bootstrapping section now explains that the packaged executable
   contains all dependencies and uninstallation uses Add/Remove Programs.
@@ -69,10 +71,10 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   `KeywordIndex`, `ClipExporter`, `transcript_exporter`, `Settings`, or
   `MainWindow` eagerly. Import these objects from their specific modules instead
   of `src`.
-- Removed bootstrapper.
-- Removed `tests/test_bootstrapper.py` now that installation occurs at build
-  time, and updated `tests/test_run_app.py` and `tests/test_uninstaller.py` to
-  reflect the simplified startup and uninstall behavior.
+- Removed runtime bootstrapper.
+- Test suite updated to reflect the simplified startup and uninstall behavior.
+  Removed `tests/test_bootstrapper.py` now that installation occurs at build
+  time and updated `tests/test_run_app.py` and `tests/test_uninstaller.py`.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
