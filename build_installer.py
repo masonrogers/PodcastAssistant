@@ -2,7 +2,6 @@
 
 from src.logging_setup import setup_logging, get_logger
 
-setup_logging()
 logger = get_logger("build_installer")
 
 import os
@@ -11,8 +10,16 @@ import pip._vendor.certifi
 
 
 def main() -> None:
-    logger.info("Building installer")
+    """Run PyInstaller to build the executable."""
+    setup_logging()
+
+    logger.info("Starting PyInstaller build")
     cert_path = pip._vendor.certifi.where()
+    out_dir = "dist"
+    logger.info("Resolved certificate path: %s", cert_path)
+    logger.info("Output directory: %s", out_dir)
+
+    logger.info("Invoking PyInstaller")
     PyInstaller.__main__.run(
         [
             "src/run_app.py",
@@ -25,9 +32,10 @@ def main() -> None:
             "--hidden-import=pip._vendor.certifi",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
             "--distpath",
-            "dist",
+            out_dir,
         ]
     )
+    logger.info("PyInstaller build completed")
 
 
 if __name__ == "__main__":  # pragma: no cover - not tested

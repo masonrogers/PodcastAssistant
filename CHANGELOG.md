@@ -24,6 +24,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
   locate its certificates at runtime.
 - Removed `--hidden-import` options for pip's internal commands and
   `pip._vendor.distlib` from the build script.
+- `build_installer.py` now invokes `setup_logging()` in `main()` and logs the
+  certificate path, output directory and completion status of the PyInstaller
+  run.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
