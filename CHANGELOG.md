@@ -23,6 +23,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `.gitignore` now excludes PyInstaller-generated `*.spec` files.
 - PyInstaller build now loads `pyinstaller_hooks/hook-whispercpp.py` via
   `--additional-hooks-dir` so WhisperCPP's dynamic libraries bundle correctly.
+- Documented Python version requirements in README and user guide; note that newer versions may lack `whispercpp` wheels.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator
