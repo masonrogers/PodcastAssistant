@@ -16,7 +16,9 @@
   - Full transcript → TXT, JSON, SRT
 - Highlighted segment → same text formats plus clipped audio (FFmpeg).
 - Entirely offline / internal use; no data leaves the machine.
-- Uninstallation cleans up any dependencies installed by the bootstrapper.
+- Uninstallation cleans up any dependencies installed by the bootstrapper. Run
+  `WhisperTranscriber.exe uninstaller.py` (or `python src/uninstaller.py` when
+  running from source) to remove them.
 
 ## 2 — Technology Stack
 

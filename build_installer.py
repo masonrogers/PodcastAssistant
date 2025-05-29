@@ -36,6 +36,7 @@ def main() -> None:
             "--hidden-import=whispercpp",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
             f"--add-data=requirements.txt{os.pathsep}.",
+            f"--add-data=src/uninstaller.py{os.pathsep}.",
             "--distpath",
             out_dir,
         ]
