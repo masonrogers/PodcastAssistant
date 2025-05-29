@@ -27,6 +27,7 @@ def main() -> None:
             "src/run_app.py",
             "--paths",
             "src",
+            "--additional-hooks-dir=pyinstaller_hooks",
             "--name=WhisperTranscriber",
             "--onefile",
             "--windowed",
