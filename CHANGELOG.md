@@ -45,6 +45,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `Bootstrapper._missing_packages` now imports each module with
   `importlib.import_module` and marks packages missing when an `ImportError`
   occurs. Tests patch `importlib.import_module` accordingly.
+- `build_installer.py` now passes `--collect-all=whispercpp` and
+  `--hidden-import=whispercpp` to PyInstaller so the packaged executable
+  includes WhisperCPP resources.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,

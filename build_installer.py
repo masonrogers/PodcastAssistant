@@ -32,6 +32,8 @@ def main() -> None:
             "--windowed",
             "--noconfirm",
             "--hidden-import=pip._vendor.certifi",
+            "--collect-all=whispercpp",
+            "--hidden-import=whispercpp",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
             f"--add-data=requirements.txt{os.pathsep}.",
             "--distpath",
