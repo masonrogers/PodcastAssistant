@@ -42,6 +42,9 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
    `whispercpp` when launching the packaged executable.
 - `Bootstrapper.__init__` now checks `sys.frozen` and reads `requirements.txt`
   from the executable's directory when running as a PyInstaller bundle.
+- `Bootstrapper._missing_packages` now imports each module with
+  `importlib.import_module` and marks packages missing when an `ImportError`
+  occurs. Tests patch `importlib.import_module` accordingly.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,
