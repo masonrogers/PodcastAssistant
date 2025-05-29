@@ -29,6 +29,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - `build_installer.py` now invokes `setup_logging()` in `main()` and logs the
   certificate path, output directory and completion status of the PyInstaller
   run.
+- `build_installer.py` now prepends the repository's `src` directory to `sys.path` so `src.logging_setup` imports reliably.
 
 ## [0.1.0] – YYYY-MM-DD
 ### Added
