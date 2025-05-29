@@ -37,9 +37,11 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
     `logs/app.log` except `build_installer.py`, which uses
     `logs/installer_build.log`. It also notes that log files rotate and reside in
     the `logs/` directory.
- - `run_app.py` now imports `MainWindow` only after the bootstrapper finishes
+- `run_app.py` now imports `MainWindow` only after the bootstrapper finishes
    installing packages. This prevents `ModuleNotFoundError` for modules like
    `whispercpp` when launching the packaged executable.
+- `Bootstrapper.__init__` now checks `sys.frozen` and reads `requirements.txt`
+  from the executable's directory when running as a PyInstaller bundle.
 
 ### Removed
 - **BREAKING**: `src.__init__` no longer imports `TranscriptAggregator`,

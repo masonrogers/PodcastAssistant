@@ -119,6 +119,11 @@ python build_installer.py
 The build process bundles pip's CA certificates so that pip can install
 missing packages at runtime.
 
+When running the bundled executable, the bootstrapper checks ``sys.frozen``. If
+set, it reads ``requirements.txt`` from the same directory as
+``sys.executable``. When running from source, it falls back to the repository's
+``requirements.txt``.
+
 The resulting executable will be placed in the `dist/` directory. The
 `installer/whisper_transcriber.nsi` script can then be adapted to wrap this
 binary in an NSIS installer.

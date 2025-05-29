@@ -165,3 +165,28 @@ def test_ensure_ffmpeg_installs_when_missing_and_skips_when_present(monkeypatch)
     bs_module.ensure_ffmpeg()
 
     assert runs == []
+
+
+def test_bootstrapper_defaults_to_executable_dir_when_frozen(monkeypatch, tmp_path):
+    """Bootstrapper reads requirements next to the executable in frozen mode."""
+    stubs = make_pyside6_stub()
+    for name, module in stubs.items():
+        monkeypatch.setitem(sys.modules, name, module)
+
+    # Simulate a PyInstaller bundle
+    monkeypatch.setattr(sys, 'frozen', True, raising=False)
+    exe_path = tmp_path / 'WhisperTranscriber.exe'
+    monkeypatch.setattr(sys, 'executable', str(exe_path))
+
+    req_file = tmp_path / 'requirements.txt'
+    req_file.write_text('')
+
+    monkeypatch.setattr(importlib.util, 'find_spec', lambda name: object())
+    monkeypatch.setattr(shutil, 'which', lambda name: '/usr/bin/ffmpeg')
+    monkeypatch.setattr(subprocess, 'run', lambda *a, **kw: types.SimpleNamespace(returncode=0))
+
+    sys.modules.pop('bootstrapper', None)
+    bs_module = importlib.import_module('bootstrapper')
+    boot = bs_module.Bootstrapper()
+
+    assert boot.requirements_path == str(req_file.resolve())
