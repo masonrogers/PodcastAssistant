@@ -18,6 +18,7 @@ Whenever a feature is added or removed, update the "Unreleased" section with a d
 - PyInstaller build now loads `pyinstaller_hooks/hook-whispercpp.py` via
   `--additional-hooks-dir` so WhisperCPP's dynamic libraries bundle correctly.
 - Documented Python version requirements in README and user guide; note that newer versions may lack `whispercpp` wheels.
+- `requirements.txt` now lists `torch` and `torchaudio`. README and the user guide instruct users to install these packages when running from source.
 
 ### Changed
  - Replaced `docs/user_guide.pdf` with a plain-text version. The generator

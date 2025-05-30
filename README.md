@@ -2,7 +2,7 @@
 
 ## 1 — Core Functionality
 
-- The packaged executable embeds Python, a static FFmpeg binary via `static-ffmpeg`, and all required libraries. Install Python and the packages in `requirements.txt` only when running from source.
+- The packaged executable embeds Python, a static FFmpeg binary via `static-ffmpeg`, and all required libraries. Install Python and the packages in `requirements.txt` \(including `torch` and `torchaudio`\) only when running from source.
 - Accept multiple audio files (browse or drag-drop). The file list supports
   drag-and-drop reordering and files are processed in that sequence.
 - Perform local Whisper sentence-level transcription with timestamps and Speaker 1/2/3 tags (users can rename later).
@@ -102,7 +102,7 @@ That’s the entire plan—feature set, tech choices, modules, and deliverables�
 
 ### Prerequisites
 
-- Python 3.10 or 3.11 with all packages from `requirements.txt` (newer versions
+- Python 3.10 or 3.11 with all packages from `requirements.txt` (including `torch` and `torchaudio`; newer versions
   may not have `whispercpp` wheels)
 - `pyinstaller` available on your PATH (`pip install pyinstaller`)
 - (Optional) [NSIS](https://nsis.sourceforge.io/) for creating the final
