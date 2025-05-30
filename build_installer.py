@@ -36,6 +36,8 @@ def main() -> None:
             "--collect-all=whispercpp",
             "--collect-binaries=whispercpp",
             "--hidden-import=whispercpp",
+            "--hidden-import=torch",
+            "--hidden-import=torchaudio",
             f"--add-data={cert_path}{os.pathsep}pip/_vendor/certifi",
             "--distpath",
             out_dir,

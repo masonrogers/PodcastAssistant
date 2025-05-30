@@ -3,3 +3,6 @@ pyannote.audio
 ffmpeg-python
 PySide6
 static-ffmpeg
+
+torch
+torchaudio
